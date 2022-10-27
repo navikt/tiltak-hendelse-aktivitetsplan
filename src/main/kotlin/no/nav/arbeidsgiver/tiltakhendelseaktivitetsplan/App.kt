@@ -9,7 +9,6 @@ import io.ktor.server.routing.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import java.io.Closeable
 
-
 class App() : Closeable {
     private val server = embeddedServer(Netty, port = 8080) {
 
@@ -28,12 +27,8 @@ class App() : Closeable {
         server.stop(0, 0)
     }
 }
-fun main(args: Array<String>) {
+fun main() {
     println("Hello World!")
-
-    // Try adding program arguments via Run/Debug configuration.
-    // Learn more about running applications: https://www.jetbrains.com/help/idea/running-applications.html.
-    println("Program arguments: ${args.joinToString()}")
     App().start()
 }
 
