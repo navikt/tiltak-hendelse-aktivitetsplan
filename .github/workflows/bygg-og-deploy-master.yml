@@ -3,7 +3,7 @@ name: Bygg og deploy master
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
 
 env:
   GITHUB_REPOSITORY: ${{ github.repository }}
