@@ -11,7 +11,7 @@ class AktivitetsplanProducer(
 ) {
     val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-    suspend fun sendMelding(melding: AvtaleHendelseMelding) {
+    fun sendMelding(melding: AvtaleHendelseMelding) {
         val aktivitetsplanMelding = AktivitetsplanMelding.fromHendelseMelding(melding)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
         val record = ProducerRecord("aktivitetsPlanTopic", meldingJson)
