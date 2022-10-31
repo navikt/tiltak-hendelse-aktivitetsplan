@@ -16,8 +16,7 @@ class AvtaleHendelseConsumer(
     ) {
     val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-
-    suspend fun start() {
+    fun start() {
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
 
