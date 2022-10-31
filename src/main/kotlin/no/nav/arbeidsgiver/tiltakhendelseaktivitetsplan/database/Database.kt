@@ -6,6 +6,7 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import org.flywaydb.core.Flyway
+import java.util.UUID
 
 class Database {
     private val dataSource: HikariDataSource = hikari()
@@ -32,15 +33,32 @@ class Database {
     }
 
     fun lagreEntitet() {
-        val query: String = ""
-        val query2: String = "select 1 from avtale_hendelse";
+        val query: String = "select 1 from avtale_hendelse";
         runQuery(query)
     }
 
+    fun settEntitetTilSendt(id: UUID) {
+        val query: String = """
+            update avtale_hendelse set sendt = true, feilmelding = null where melding_id = ?"
+        """.trimIndent()
+        using(sessionOf(dataSource)) { session ->
+            session.run(queryOf(query, id).asUpdate)
+        }
+    }
+
+    fun settFeilmeldingPåEntitet(id: UUID, feilmelding: String) {
+        val query: String = """
+            update avtale_hendelse set feilmelding = ? where melding_id = ?"
+        """.trimIndent()
+        using(sessionOf(dataSource)) { session ->
+            session.run(queryOf(query, feilmelding, id).asUpdate)
+        }
+    }
 
     fun runQuery(query: String) {
         using(sessionOf(dataSource)) { session ->
             session.run(queryOf("${query}".trimIndent()).asExecute)
         }
     }
+
 }
