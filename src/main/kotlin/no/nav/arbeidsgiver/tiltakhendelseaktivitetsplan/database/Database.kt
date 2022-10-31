@@ -31,12 +31,16 @@ class Database {
         }
     }
 
+    fun lagreEntitet() {
+        val query: String = ""
+        val query2: String = "select 1 from avtale_hendelse";
+        runQuery(query)
+    }
 
-    fun runQuery() {
+
+    fun runQuery(query: String) {
         using(sessionOf(dataSource)) { session ->
-            session.run(queryOf("""
-                select 1 from avtale_hendelse
-            """.trimIndent()).asExecute)
+            session.run(queryOf("${query}".trimIndent()).asExecute)
         }
     }
 }

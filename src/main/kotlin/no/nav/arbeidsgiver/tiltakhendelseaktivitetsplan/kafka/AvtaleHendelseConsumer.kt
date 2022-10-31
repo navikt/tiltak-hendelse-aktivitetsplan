@@ -3,10 +3,12 @@ package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import java.time.Duration
+import java.time.LocalDateTime
 
 class AvtaleHendelseConsumer(private val consumer: Consumer<String, String>) {
     val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -22,6 +24,21 @@ class AvtaleHendelseConsumer(private val consumer: Consumer<String, String>) {
             consumer.commitAsync()
             records.forEach {
                 val melding: AvtaleHendelseMelding = mapper.readValue(it.value())
+                val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
+                    meldingId = melding.id.toString(),
+                    avtaleId = melding.id,
+                    avtaleStatus = melding.avtaleStatus,
+                    tidspunkt = LocalDateTime.now(),
+                    hendelseType = melding.hendelseType,
+                    mottattJson = melding.toString(),
+                    sendingJson = null,
+                    sendt = false
+                )
+
+                ;
+                // Opprette DB-entitet med sendt=false som registrerer event
+                // Save entitet i DB
+                // Lytte på entitet oppretet event og sende på kafka til aktivitetsplnanen
             }
         }
 
