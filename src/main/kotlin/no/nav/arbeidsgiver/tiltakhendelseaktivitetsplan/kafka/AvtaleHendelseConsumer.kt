@@ -9,12 +9,14 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import java.time.Duration
 import java.time.LocalDateTime
-
-class AvtaleHendelseConsumer(private val consumer: Consumer<String, String>) {
+class AvtaleHendelseConsumer(
+    private val consumer: Consumer<String, String>,
+    private val aktivitetsplanProducer: AktivitetsplanProducer
+    ) {
     val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
 
-    fun start() {
+    suspend fun start() {
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
 
@@ -37,8 +39,14 @@ class AvtaleHendelseConsumer(private val consumer: Consumer<String, String>) {
 
                 ;
                 // Opprette DB-entitet med sendt=false som registrerer event
-                // Save entitet i DB
+                // Save entitet i DB med sendt = false
                 // Lytte på entitet oppretet event og sende på kafka til aktivitetsplnanen
+
+                // kjør en asynkron co-routine
+                val job = launch {
+                    aktivitetsplanProducer.sendMelding(melding)
+                    // denne oppdaterer sendt til true
+                }
             }
         }
 
