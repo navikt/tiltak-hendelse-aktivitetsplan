@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
@@ -13,7 +14,7 @@ class AktivitetsplanProducer(
     private val producer: Producer<String, String>,
     private val database: Database
 ) {
-    val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    private val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
     fun sendMelding(melding: AvtaleHendelseMelding) {
         val aktivitetsplanMelding = AktivitetsplanMelding.fromHendelseMelding(melding)
