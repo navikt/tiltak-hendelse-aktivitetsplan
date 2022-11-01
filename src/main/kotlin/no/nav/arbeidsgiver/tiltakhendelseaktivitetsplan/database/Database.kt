@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import kotliquery.HikariCP
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -9,7 +10,15 @@ import org.flywaydb.core.Flyway
 import java.util.UUID
 
 class Database {
-    private val dataSource: HikariDataSource = hikari()
+    //private val dataSource: HikariDataSource = hikari()
+
+    val dataSource = HikariCP.init(
+        url = "jdbc:h2:mem:default",
+        username = "sa",
+        password = "sa"
+    ) {
+        maximumPoolSize = 2
+    }
 
     init {
         val flyway = Flyway.configure()
@@ -34,7 +43,7 @@ class Database {
 
     fun lagreNyAvtaleMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
         val query: String = """
-            insert into avtale_hendelse () values
+            insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt) values
             (?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent();
         using(sessionOf(dataSource)) { session ->
@@ -42,9 +51,9 @@ class Database {
                 query,
                 entitet.id,
                 entitet.avtaleId,
-                entitet.avtaleStatus,
+                entitet.avtaleStatus.name,
                 entitet.opprettetTidspunkt,
-                entitet.hendelseType,
+                entitet.hendelseType.name,
                 entitet.mottattJson,
                 entitet.sendingJson,
                 entitet.sendt
@@ -53,7 +62,7 @@ class Database {
     }
 
     fun hentEntitet(id: UUID): AktivitetsplanMeldingEntitet? {
-        val query: String = "select * from avtale_hendelse where id = ?"
+        val query: String = "select * from aktivitetsplan_melding where id = ?"
         return using( sessionOf(dataSource)) { session ->
             session.run(queryOf(query, id).map(tilAvtaleMeldingEntitet).asSingle)
         }
@@ -61,7 +70,7 @@ class Database {
 
     fun settEntitetTilSendt(id: UUID) {
         val query: String = """
-            update avtale_hendelse set sendt = true, feilmelding = null where id = ?"
+            update aktivitetsplan_melding set sendt = true, feilmelding = null where id = ?"
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query, id).asUpdate)
@@ -70,7 +79,7 @@ class Database {
 
     fun settFeilmeldingPåEntitet(id: UUID, feilmelding: String) {
         val query: String = """
-            update avtale_hendelse set feilmelding = ? where id = ?"
+            update aktivitetsplan_melding set feilmelding = ? where id = ?"
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query, feilmelding, id).asUpdate)

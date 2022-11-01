@@ -6,6 +6,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.runBlocking
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import java.io.Closeable
 
@@ -19,7 +20,9 @@ class App() : Closeable {
     }
 
     fun start() {
-        server.start(wait = true)
+        log.info("Starter applikasjon :)")
+        server.start()
+        runBlocking { while(true) { } }
     }
 
     override fun close() {
@@ -28,8 +31,5 @@ class App() : Closeable {
     }
 }
 fun main() {
-    println("Hello World!")
     App().start()
 }
-
-
