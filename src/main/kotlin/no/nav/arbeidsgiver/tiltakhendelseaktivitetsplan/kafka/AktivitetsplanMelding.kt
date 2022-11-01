@@ -20,13 +20,11 @@ data class AktivitetsplanMelding(
 
     // Attributter, lenker og lignende
 
-
-
 ) {
     companion object {
         fun fromHendelseMelding(melding: AvtaleHendelseMelding) : AktivitetsplanMelding {
             return AktivitetsplanMelding(
-                id = melding.id,
+                id = melding.avtaleId,
                 personIdent = melding.deltakerFnr,
                 startDato = melding.startDato,
                 sluttDato = melding.sluttDato,

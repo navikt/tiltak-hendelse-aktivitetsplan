@@ -1,9 +1,9 @@
 create table aktivitetsplan_melding
 (
-    melding_id    uuid primary key,
-    avtale_id     uuid references avtale (id),
+    id            uuid primary key,
+    avtale_id     uuid,
     avtale_status varchar,
-    tidspunkt     timestamp,
+    opprettett_tidspunkt     timestamp,
     hendelse_type varchar,
     mottatt_json  varchar,
     sending_json  varchar,

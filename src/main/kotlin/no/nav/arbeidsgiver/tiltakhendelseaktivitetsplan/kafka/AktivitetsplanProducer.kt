@@ -16,20 +16,21 @@ class AktivitetsplanProducer(
 ) {
     private val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
+    // Burde det egentlig AktivitetsplanMeldingEntitet som parameter? Med tanke på resend
     fun sendMelding(melding: AvtaleHendelseMelding) {
         val aktivitetsplanMelding = AktivitetsplanMelding.fromHendelseMelding(melding)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
-        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.id.toString(), meldingJson)
+        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.avtaleId.toString(), meldingJson)
         producer.send(record) { recordMetadata, exception ->
             when (exception) {
                 null -> {
                     log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
                     // Oppdatere sendt til true
-                    database.settEntitetTilSendt(melding.id)
+                    database.settEntitetTilSendt(melding.avtaleId)
                 }
                 else -> {
                     log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-                    database.settFeilmeldingPåEntitet(melding.id, "feilmeldingen her")
+                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
                 }
             }
         }

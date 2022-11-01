@@ -19,7 +19,7 @@ data class AvtaleHendelseMelding(
     var avtaleInngått: LocalDateTime,
     var utførtAv: String,
     var deltakerFnr: String,
-    var id: UUID,
+    var avtaleId: UUID,
     var avtaleNr: Int,
     var sistEndret: Instant,
     var veilederNavIdent: String

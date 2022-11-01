@@ -32,14 +32,36 @@ class Database {
         }
     }
 
-    fun lagreEntitet() {
-        val query: String = "select 1 from avtale_hendelse";
-        runQuery(query)
+    fun lagreNyAvtaleMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
+        val query: String = """
+            insert into avtale_hendelse () values
+            (?, ?, ?, ?, ?, ?, ?, ?)
+        """.trimIndent();
+        using(sessionOf(dataSource)) { session ->
+            session.run(queryOf(
+                query,
+                entitet.id,
+                entitet.avtaleId,
+                entitet.avtaleStatus,
+                entitet.opprettetTidspunkt,
+                entitet.hendelseType,
+                entitet.mottattJson,
+                entitet.sendingJson,
+                entitet.sendt
+            ).asUpdate)
+        }
+    }
+
+    fun hentEntitet(id: UUID): AktivitetsplanMeldingEntitet? {
+        val query: String = "select * from avtale_hendelse where id = ?"
+        return using( sessionOf(dataSource)) { session ->
+            session.run(queryOf(query, id).map(tilAvtaleMeldingEntitet).asSingle)
+        }
     }
 
     fun settEntitetTilSendt(id: UUID) {
         val query: String = """
-            update avtale_hendelse set sendt = true, feilmelding = null where melding_id = ?"
+            update avtale_hendelse set sendt = true, feilmelding = null where id = ?"
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query, id).asUpdate)
@@ -48,16 +70,10 @@ class Database {
 
     fun settFeilmeldingPåEntitet(id: UUID, feilmelding: String) {
         val query: String = """
-            update avtale_hendelse set feilmelding = ? where melding_id = ?"
+            update avtale_hendelse set feilmelding = ? where id = ?"
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query, feilmelding, id).asUpdate)
-        }
-    }
-
-    fun runQuery(query: String) {
-        using(sessionOf(dataSource)) { session ->
-            session.run(queryOf("${query}".trimIndent()).asExecute)
         }
     }
 
