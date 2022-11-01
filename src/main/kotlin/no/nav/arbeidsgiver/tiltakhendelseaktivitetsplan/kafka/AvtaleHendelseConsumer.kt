@@ -31,6 +31,7 @@ class AvtaleHendelseConsumer(
                 consumer.commitAsync()
                 records.forEach {
                     val melding: AvtaleHendelseMelding = mapper.readValue(it.value())
+                    // Filtrere de som skal til aktivitetplan
                     val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
                         id = UUID.randomUUID(),
                         avtaleId = melding.avtaleId,
@@ -42,11 +43,6 @@ class AvtaleHendelseConsumer(
                         sendt = false
                     )
                     database.lagreNyAvtaleMeldingEntitet(aktivitetsplanMeldingEntitet)
-                    ;
-                    // Opprette DB-entitet med sendt=false som registrerer event
-                    // Save entitet i DB med sendt = false
-                    // Lytte på entitet oppretet event og sende på kafka til aktivitetsplnanen
-
                     // kjør en asynkron co-routine
                     val job = launch {
                         aktivitetsplanProducer.sendMelding(melding)

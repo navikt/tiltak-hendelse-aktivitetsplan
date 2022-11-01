@@ -3,12 +3,9 @@ package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleStatus
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.HendelseType
 import org.junit.jupiter.api.Test
-
-import startTestApp
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 class DatabaseTest {
 
