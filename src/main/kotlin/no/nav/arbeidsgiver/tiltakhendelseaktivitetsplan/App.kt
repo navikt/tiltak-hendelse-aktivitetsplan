@@ -7,12 +7,12 @@ import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProducer
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseConsumer
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.consumerConfig
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.producerConfig
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -20,6 +20,7 @@ import org.apache.kafka.clients.producer.Producer
 import java.io.Closeable
 
 class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeable {
+    private val logger = KotlinLogging.logger {}
     private val server = embeddedServer(Netty, port = 8092) {
 
         routing {
@@ -29,7 +30,7 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
     }
 
     fun start() {
-        log.info("Starter applikasjon :)")
+        logger.info("Starter applikasjon :)")
         server.start()
         runBlocking {
             // avtaleHendelseConsumer.start()
@@ -37,7 +38,7 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
     }
 
     override fun close() {
-        log.info("Stopper app")
+        logger.info("Stopper app")
         server.stop(0, 0)
     }
 }
