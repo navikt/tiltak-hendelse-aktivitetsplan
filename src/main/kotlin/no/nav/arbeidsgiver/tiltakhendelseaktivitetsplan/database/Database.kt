@@ -6,6 +6,7 @@ import kotliquery.HikariCP
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.flywaydb.core.Flyway
 import java.util.UUID
 
@@ -59,6 +60,7 @@ class Database {
                 entitet.sendt
             ).asUpdate)
         }
+        log.info("Lagret avtalemeldingentitet i database")
     }
 
     fun hentEntitet(id: UUID): AktivitetsplanMeldingEntitet? {

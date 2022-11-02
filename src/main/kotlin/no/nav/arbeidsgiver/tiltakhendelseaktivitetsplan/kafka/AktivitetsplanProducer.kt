@@ -18,6 +18,7 @@ class AktivitetsplanProducer(
 
     // Burde det egentlig AktivitetsplanMeldingEntitet som parameter? Med tanke på resend
     fun sendMelding(melding: AvtaleHendelseMelding) {
+        log.info("Sender melding for avtaleId ${melding.avtaleId} til aktivitetsplan")
         val aktivitetsplanMelding = AktivitetsplanMelding.fromHendelseMelding(melding)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.avtaleId.toString(), meldingJson)

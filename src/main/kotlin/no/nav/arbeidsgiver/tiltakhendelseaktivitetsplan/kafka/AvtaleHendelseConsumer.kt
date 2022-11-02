@@ -47,6 +47,7 @@ class AvtaleHendelseConsumer(
                     database.lagreNyAvtaleMeldingEntitet(aktivitetsplanMeldingEntitet)
                     // kjør en asynkron co-routine
                     val job = launch {
+                        log.info("Launcher produsent for å sende melding til aktivitsplan")
                         aktivitetsplanProducer.sendMelding(melding)
                         // denne oppdaterer sendt til true
                     }

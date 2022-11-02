@@ -33,7 +33,7 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
         logger.info("Starter applikasjon :)")
         server.start()
         runBlocking {
-            // avtaleHendelseConsumer.start()
+            avtaleHendelseConsumer.start()
         }
     }
 
