@@ -10,7 +10,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.flywaydb.core.Flyway
 import java.util.UUID
 
-class Database {
+class DatabaseLokal {
     //private val dataSource: HikariDataSource = hikari()
 
     val dataSource = HikariCP.init(
@@ -27,6 +27,19 @@ class Database {
             .dataSource(dataSource)
             .load()
         flyway.migrate()
+    }
+
+    companion object {
+        private fun hikari(): HikariDataSource {
+            val config = HikariConfig()
+            config.driverClassName = "org.h2.Driver"
+            config.jdbcUrl = "jdbc:h2:mem:test"
+            config.maximumPoolSize = 3
+            config.isAutoCommit = false
+            config.transactionIsolation = "TRANSACTION_REPEATABLE_READ"
+            config.validate()
+            return HikariDataSource(config)
+        }
     }
 
     fun lagreNyAvtaleMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
