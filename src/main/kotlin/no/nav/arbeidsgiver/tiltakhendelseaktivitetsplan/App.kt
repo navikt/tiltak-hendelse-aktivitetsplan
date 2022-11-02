@@ -6,7 +6,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProducer

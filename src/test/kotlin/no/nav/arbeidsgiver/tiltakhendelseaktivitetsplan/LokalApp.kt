@@ -6,6 +6,7 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
+import org.h2.tools.Server
 
 fun main() {
     // Testoppsett
@@ -16,5 +17,6 @@ fun main() {
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
 
     val app = App(avtaleHendelseConsumer)
+    Server.createWebServer().start()
     app.start()
 }
