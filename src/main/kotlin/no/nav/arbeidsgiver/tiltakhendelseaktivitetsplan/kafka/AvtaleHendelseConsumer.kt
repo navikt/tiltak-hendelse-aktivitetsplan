@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
@@ -23,7 +24,7 @@ class AvtaleHendelseConsumer(
     fun start() {
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
-
+        mapper.registerModule(JavaTimeModule())
         runBlocking {
             while (true) {
                 val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(5))
@@ -31,6 +32,7 @@ class AvtaleHendelseConsumer(
                 consumer.commitAsync()
                 records.forEach {
                     val melding: AvtaleHendelseMelding = mapper.readValue(it.value())
+                    log.info("Lest melding med avtale-id ${melding.avtaleId}")
                     // Filtrere de som skal til aktivitetplan
                     val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
                         id = UUID.randomUUID(),
