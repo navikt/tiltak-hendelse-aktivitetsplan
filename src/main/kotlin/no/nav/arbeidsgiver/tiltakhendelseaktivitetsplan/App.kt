@@ -32,9 +32,7 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
     fun start() {
         logger.info("Starter applikasjon :)")
         server.start()
-        runBlocking {
-            avtaleHendelseConsumer.start()
-        }
+        avtaleHendelseConsumer.start()
     }
 
     override fun close() {

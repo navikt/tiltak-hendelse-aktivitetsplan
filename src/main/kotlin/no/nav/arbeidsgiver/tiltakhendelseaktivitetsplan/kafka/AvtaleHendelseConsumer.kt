@@ -21,39 +21,40 @@ class AvtaleHendelseConsumer(
     ) {
     val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-    fun start() {
+    fun start() = runBlocking {
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
         mapper.registerModule(JavaTimeModule())
-        runBlocking {
-            while (true) {
-                val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(5))
-                records.isEmpty && continue
-                consumer.commitAsync()
-                records.forEach {
-                    val melding: AvtaleHendelseMelding = mapper.readValue(it.value())
-                    log.info("Lest melding med avtale-id ${melding.avtaleId}")
-                    // Filtrere de som skal til aktivitetplan
-                    val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
-                        id = UUID.randomUUID(),
-                        avtaleId = melding.avtaleId,
-                        avtaleStatus = melding.avtaleStatus,
-                        opprettetTidspunkt = LocalDateTime.now(),
-                        hendelseType = melding.hendelseType,
-                        mottattJson = it.value(),
-                        sendingJson = null,
-                        sendt = false
-                    )
-                    database.lagreNyAvtaleMeldingEntitet(aktivitetsplanMeldingEntitet)
-                    // kjør en asynkron co-routine
-                    val job = launch {
-                        log.info("Launcher produsent for å sende melding til aktivitsplan")
-                        aktivitetsplanProducer.sendMelding(melding)
-                        // denne oppdaterer sendt til true
-                    }
-                }
+        while (true) {
+            val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(5))
+            records.isEmpty && continue
+            consumer.commitAsync()
+            records.forEach {
+                val melding: AvtaleHendelseMelding = mapper.readValue(it.value())
+                log.info("Lest melding med avtale-id ${melding.avtaleId}")
+                // Filtrere de som skal til aktivitetplan
+                val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
+                    id = UUID.randomUUID(),
+                    avtaleId = melding.avtaleId,
+                    avtaleStatus = melding.avtaleStatus,
+                    opprettetTidspunkt = LocalDateTime.now(),
+                    hendelseType = melding.hendelseType,
+                    mottattJson = it.value(),
+                    sendingJson = null,
+                    sendt = false
+                )
+                database.lagreNyAvtaleMeldingEntitet(aktivitetsplanMeldingEntitet)
+                // kjør en asynkron co-routine
+                val job = kallProducer(aktivitetsplanMeldingEntitet)
+                log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
             }
         }
     }
 
+    suspend fun kallProducer(melding: AktivitetsplanMeldingEntitet) = coroutineScope {
+        launch {
+            log.info("Launcher produsent for å sende melding til aktivitsplan")
+            aktivitetsplanProducer.sendMelding(melding)
+        }
+    }
 }
