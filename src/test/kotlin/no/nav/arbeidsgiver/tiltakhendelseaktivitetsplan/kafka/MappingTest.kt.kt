@@ -1,10 +1,16 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.junit.jupiter.api.Test
+import java.time.Instant
+import java.time.LocalDate
+import java.util.*
+import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 class MappingTest {
 
@@ -111,5 +117,30 @@ class MappingTest {
         val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         mapper.registerModule(JavaTimeModule())
         val melding: AvtaleHendelseMelding = mapper.readValue(meldingJson)
+    }
+
+    @Test
+    fun melding_til_aktivitetsplan_skal_serialiseres() {
+        val aktivitetsplanMelding = AktivitetsplanMelding(
+            UUID.randomUUID(),
+            "12345678901",
+            LocalDate.now(),
+            LocalDate.now(),
+            "En tittel",
+            "En beskrivelse",
+            AktivitetStatus.FULLFØRT,
+            "L123456",
+            Instant.now(),
+            true,
+            "Hepp"
+        )
+
+        val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .registerModule(JavaTimeModule())
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        val json = mapper.writeValueAsString(aktivitetsplanMelding)
+        println(json)
+
     }
 }

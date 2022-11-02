@@ -72,7 +72,7 @@ class Database {
 
     fun settEntitetTilSendt(id: UUID) {
         val query: String = """
-            update aktivitetsplan_melding set sendt = true, feilmelding = null where id = ?"
+            update aktivitetsplan_melding set sendt = true, feilmelding = null where id = ?
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query, id).asUpdate)
@@ -81,10 +81,19 @@ class Database {
 
     fun settFeilmeldingPåEntitet(id: UUID, feilmelding: String) {
         val query: String = """
-            update aktivitetsplan_melding set feilmelding = ? where id = ?"
+            update aktivitetsplan_melding set feilmelding = ? where id = ?
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query, feilmelding, id).asUpdate)
+        }
+    }
+
+    fun settEntitetSendingJson(id: UUID, meldingJson: String) {
+        val query: String = """
+            update aktivitetsplan_melding set sending_json = ? where id = ?
+        """.trimIndent()
+        using(sessionOf(dataSource)) { session ->
+            session.run(queryOf(query, meldingJson, id).asUpdate)
         }
     }
 

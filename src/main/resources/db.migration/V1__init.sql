@@ -7,5 +7,6 @@ create table aktivitetsplan_melding
     hendelse_type varchar,
     mottatt_json  varchar,
     sending_json  varchar,
-    sendt         boolean not null default false
+    sendt         boolean not null default false,
+    feilmelding   varchar
 );
