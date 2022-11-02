@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProd
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseConsumer
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.consumerConfig
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.producerConfig
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -31,7 +32,9 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
     fun start() {
         logger.info("Starter applikasjon :)")
         server.start()
-        avtaleHendelseConsumer.start()
+        if(Cluster.current != Cluster.PROD_GCP) {
+            avtaleHendelseConsumer.start()
+        }
     }
 
     override fun close() {
@@ -40,7 +43,7 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
     }
 }
 fun main() {
-    // Setup prod kafka and database
+    // Setup kafka and database
     val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
     val producer: Producer<String, String> = KafkaProducer(producerConfig())
     val database = Database()
