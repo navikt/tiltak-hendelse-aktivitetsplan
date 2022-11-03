@@ -1,24 +1,27 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
 import kotliquery.HikariCP
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.flywaydb.core.Flyway
-import java.util.UUID
+import java.util.*
 
 class Database {
     //private val dataSource: HikariDataSource = hikari()
+    val DB_HOST = System.getenv("DB_HOST")
+    val DB_PORT = System.getenv("DB_PORT")
+    val DB_DATABASE = System.getenv("DB_DATABASE")
+    val DB_USERNAME = System.getenv("DB_USERNAME")
+    val DB_PASSWORD = System.getenv("DB_PASSWORD")
 
     val dataSource = HikariCP.init(
-        url = "jdbc:h2:mem:default",
-        username = "sa",
-        password = "sa"
+        url = "jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?user=${DB_USERNAME}&password=${DB_PASSWORD}",
+        username = DB_USERNAME,
+        password = DB_PASSWORD
     ) {
-        maximumPoolSize = 2
+        maximumPoolSize = 4
     }
 
     init {
@@ -35,24 +38,26 @@ class Database {
             (?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent();
         using(sessionOf(dataSource)) { session ->
-            session.run(queryOf(
-                query,
-                entitet.id,
-                entitet.avtaleId,
-                entitet.avtaleStatus.name,
-                entitet.opprettetTidspunkt,
-                entitet.hendelseType.name,
-                entitet.mottattJson,
-                entitet.sendingJson,
-                entitet.sendt
-            ).asUpdate)
+            session.run(
+                queryOf(
+                    query,
+                    entitet.id,
+                    entitet.avtaleId,
+                    entitet.avtaleStatus.name,
+                    entitet.opprettetTidspunkt,
+                    entitet.hendelseType.name,
+                    entitet.mottattJson,
+                    entitet.sendingJson,
+                    entitet.sendt
+                ).asUpdate
+            )
         }
         log.info("Lagret avtalemeldingentitet i database")
     }
 
     fun hentEntitet(id: UUID): AktivitetsplanMeldingEntitet? {
         val query: String = "select * from aktivitetsplan_melding where id = ?"
-        return using( sessionOf(dataSource)) { session ->
+        return using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query, id).map(tilAvtaleMeldingEntitet).asSingle)
         }
     }
