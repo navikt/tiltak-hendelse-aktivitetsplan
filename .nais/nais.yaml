@@ -6,6 +6,8 @@ metadata:
   labels:
     "team": "team-tiltak"
 spec:
+  kafka:
+    pool: {{kafka-pool}}
   image: {{image}}
   liveness:
     path: "/tiltak-hendelse-aktivitetsplan/internal/isAlive"
