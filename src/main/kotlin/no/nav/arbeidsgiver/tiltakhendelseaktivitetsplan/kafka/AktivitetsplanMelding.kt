@@ -8,8 +8,8 @@ data class AktivitetsplanMelding(
     // Obligatoriske
     val id: UUID,
     val personIdent: String,
-    val startDato: LocalDate,
-    val sluttDato: LocalDate,
+    val startDato: LocalDate?,
+    val sluttDato: LocalDate?,
     val tittel: String,
     val beskrivelse: String,
     val aktivitetStatus: AktivitetStatus,
