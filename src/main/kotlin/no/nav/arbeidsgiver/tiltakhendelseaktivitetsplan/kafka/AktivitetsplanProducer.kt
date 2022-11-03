@@ -31,18 +31,19 @@ class AktivitetsplanProducer(
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.avtaleId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
-        producer.send(record) { recordMetadata, exception ->
-            when (exception) {
-                null -> {
-                    log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
-                    // Oppdatere sendt til true
-                    database.settEntitetTilSendt(entitet.id)
-                }
-                else -> {
-                    log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
-                }
-            }
-        }
+        log.info("Skulle egentlig sendt melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
+//        producer.send(record) { recordMetadata, exception ->
+//            when (exception) {
+//                null -> {
+//                    log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
+//                    // Oppdatere sendt til true
+//                    database.settEntitetTilSendt(entitet.id)
+//                }
+//                else -> {
+//                    log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
+//                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
+//                }
+//            }
+//        }
     }
 }
