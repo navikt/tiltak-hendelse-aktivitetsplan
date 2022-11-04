@@ -28,14 +28,27 @@ data class AktivitetsplanMelding(
                 personIdent = melding.deltakerFnr,
                 startDato = melding.startDato,
                 sluttDato = melding.sluttDato,
-                tittel = "Dette er en tittel",
+                tittel = "Avtale om ${melding.tiltakstype.beskrivelse}",
                 beskrivelse = "Dette er en beskrivelse",
-                aktivitetStatus = AktivitetStatus.FULLFØRT,
+                aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
                 endretAv = melding.utførtAv,
                 endretDato = melding.sistEndret,
                 avtaltMedNav = true,
                 avsluttetBegrunnelse = ""
             )
         }
+
+        private fun aktivitetStatusFraAvtaleStatus(avtaleStatus: AvtaleStatus): AktivitetStatus {
+            return when (avtaleStatus) {
+                AvtaleStatus.ANNULLERT -> AktivitetStatus.FULLFØRT
+                AvtaleStatus.AVBRUTT -> AktivitetStatus.FULLFØRT
+                AvtaleStatus.PÅBEGYNT -> AktivitetStatus.PLANLEGGER
+                AvtaleStatus.MANGLER_GODKJENNING -> AktivitetStatus.PLANLEGGER
+                AvtaleStatus.KLAR_FOR_OPPSTART -> AktivitetStatus.PLANLEGGER
+                AvtaleStatus.GJENNOMFØRES -> AktivitetStatus.GJENNOMFØRER
+                AvtaleStatus.AVSLUTTET -> AktivitetStatus.FULLFØRT
+            }
+        }
+
     }
 }
