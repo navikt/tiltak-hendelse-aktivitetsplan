@@ -22,7 +22,7 @@ class DatabaseTest {
 
     @Test
     fun skal_kunne_lagre_og_hente_entiteter() {
-        val database = Database()
+        val database = DatabaseLokal()
         database.lagreNyAvtaleMeldingEntitet(entitet)
         val aktivitetsplanMeldingEntitet = database.hentEntitet(UUID.fromString("6cb7a6ce-59d7-11ed-9b6a-0242ac120002"))
         assertNotNull(aktivitetsplanMeldingEntitet)
