@@ -13,7 +13,7 @@ data class AktivitetsplanMelding(
     val tittel: String,
     val beskrivelse: String,
     val aktivitetStatus: AktivitetStatus,
-    val endretAv: String,
+    val endretAv: Ident,
     val endretDato: Instant,
     val avtaltMedNav: Boolean,
     val avsluttetBegrunnelse: String,
@@ -31,11 +31,16 @@ data class AktivitetsplanMelding(
                 tittel = "Avtale om ${melding.tiltakstype.beskrivelse}",
                 beskrivelse = "Dette er en beskrivelse",
                 aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
-                endretAv = melding.utførtAv,
+                endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
                 endretDato = melding.sistEndret,
                 avtaltMedNav = true,
                 avsluttetBegrunnelse = ""
             )
+        }
+
+        private fun endretAvAktivitetsplanformat(utførtAv: String, utførtAvRolle: AvtaleHendelseUtførtAvRolle): Ident {
+            val identType = if (utførtAvRolle == AvtaleHendelseUtførtAvRolle.VEILEDER) IdentType.navIdent else IdentType.arbeidsgiver
+            return Ident(utførtAv, identType)
         }
 
         private fun aktivitetStatusFraAvtaleStatus(avtaleStatus: AvtaleStatus): AktivitetStatus {

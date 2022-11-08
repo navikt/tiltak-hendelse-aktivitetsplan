@@ -18,6 +18,7 @@ data class AvtaleHendelseMelding(
     var stillingprosent: Int?,
     var avtaleInngått: LocalDateTime?,
     var utførtAv: String,
+    var utførtAvRolle: AvtaleHendelseUtførtAvRolle,
     var deltakerFnr: String,
     var avtaleId: UUID,
     var avtaleNr: Int,

@@ -109,7 +109,8 @@ class MappingTest {
             "        \"godkjentPaVegneAvArbeidsgiverGrunn\": null,\n" +
             "        \"godkjentPaVegneAvArbeidsgiver\": false,\n" +
             "        \"innholdType\": \"ENDRE_STILLING\",\n" +
-            "        \"utførtAv\": \"Z123456\"\n" +
+            "        \"utførtAv\": \"Z123456\",\n" +
+            "        \"utførtAvRolle\": \"VEILEDER\"\n" +
             "    }"
 
     @Test
@@ -129,7 +130,7 @@ class MappingTest {
             "En tittel",
             "En beskrivelse",
             AktivitetStatus.FULLFØRT,
-            "L123456",
+            Ident("Z123456", IdentType.navIdent),
             Instant.now(),
             true,
             "Hepp"
