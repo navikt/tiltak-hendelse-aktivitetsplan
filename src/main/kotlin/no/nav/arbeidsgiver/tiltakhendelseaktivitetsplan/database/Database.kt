@@ -32,7 +32,7 @@ class Database {
         flyway.migrate()
     }
 
-    fun lagreNyAvtaleMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
+    fun lagreNyAktivitetsplanMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
         val query: String = """
             insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt) values
             (?, ?, ?, ?, ?, ?, ?, ?)
@@ -58,7 +58,7 @@ class Database {
     fun hentEntitet(id: UUID): AktivitetsplanMeldingEntitet? {
         val query: String = "select * from aktivitetsplan_melding where id = ?"
         return using(sessionOf(dataSource)) { session ->
-            session.run(queryOf(query, id).map(tilAvtaleMeldingEntitet).asSingle)
+            session.run(queryOf(query, id).map(tilAktivitetsplanMeldingEntitet).asSingle)
         }
     }
 

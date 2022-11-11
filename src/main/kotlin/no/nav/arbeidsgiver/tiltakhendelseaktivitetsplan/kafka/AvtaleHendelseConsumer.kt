@@ -48,7 +48,7 @@ class AvtaleHendelseConsumer(
                     sendingJson = null,
                     sendt = false
                 )
-                database.lagreNyAvtaleMeldingEntitet(aktivitetsplanMeldingEntitet)
+                database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
                 // kjør en asynkron co-routine
                 val job = kallProducer(aktivitetsplanMeldingEntitet)
                 log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")

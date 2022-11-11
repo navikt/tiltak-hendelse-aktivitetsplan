@@ -66,7 +66,7 @@ class DatabaseLokal {
     fun hentEntitet(id: UUID): AktivitetsplanMeldingEntitet? {
         val query: String = "select * from aktivitetsplan_melding where id = ?"
         return using( sessionOf(dataSource)) { session ->
-            session.run(queryOf(query, id).map(tilAvtaleMeldingEntitet).asSingle)
+            session.run(queryOf(query, id).map(tilAktivitetsplanMeldingEntitet).asSingle)
         }
     }
 

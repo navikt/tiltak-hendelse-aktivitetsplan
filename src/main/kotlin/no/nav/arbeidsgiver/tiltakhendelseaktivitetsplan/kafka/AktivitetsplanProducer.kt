@@ -27,7 +27,13 @@ class AktivitetsplanProducer(
     fun sendMelding(entitet: AktivitetsplanMeldingEntitet) {
         log.info("Sender melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
         val melding: AvtaleHendelseMelding = mapper.readValue(entitet.mottattJson)
-        val aktivitetsplanMelding = AktivitetsplanMelding.fromHendelseMelding(melding)
+        val aktivitetsKort = AktivitetsKort.fromHendelseMelding(melding)
+        val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(
+            melding.avtaleId,
+            "TEAM_TILTAK",
+            "UPSERT_AKTIVITETSKORT_V1",
+            "MIDL_LONNSTILSK", // må sjekke
+            aktivitetsKort)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.avtaleId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)

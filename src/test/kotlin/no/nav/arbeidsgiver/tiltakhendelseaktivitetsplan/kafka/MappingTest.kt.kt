@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
-import kotlin.reflect.jvm.internal.impl.descriptors.Visibilities.Local
 
 class MappingTest {
 
@@ -122,7 +121,7 @@ class MappingTest {
 
     @Test
     fun melding_til_aktivitetsplan_skal_serialiseres() {
-        val aktivitetsplanMelding = AktivitetsplanMelding(
+        val aktivitetsKort = AktivitetsKort(
             UUID.randomUUID(),
             "12345678901",
             LocalDate.now(),
@@ -135,6 +134,8 @@ class MappingTest {
             true,
             "Hepp"
         )
+
+        val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "source", "actionType", "aktivitetskortType", aktivitetsKort)
 
         val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(JavaTimeModule())

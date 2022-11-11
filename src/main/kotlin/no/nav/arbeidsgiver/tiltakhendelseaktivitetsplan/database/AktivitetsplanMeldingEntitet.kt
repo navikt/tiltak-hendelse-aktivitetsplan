@@ -17,7 +17,7 @@ data class AktivitetsplanMeldingEntitet (
     val sendt: Boolean,
 )
 
-val tilAvtaleMeldingEntitet: (Row) -> AktivitetsplanMeldingEntitet = { row ->
+val tilAktivitetsplanMeldingEntitet: (Row) -> AktivitetsplanMeldingEntitet = { row ->
     AktivitetsplanMeldingEntitet(
         id = UUID.fromString(row.string("id")),
         avtaleId = UUID.fromString(row.string("avtale_id")),
