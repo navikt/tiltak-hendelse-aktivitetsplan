@@ -12,7 +12,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 
-private const val AKTIVITETSPLAN_TOPIC = "topic"
+private const val AKTIVITETSPLAN_TOPIC = "dab.aktivitetskort-v1"
 
 class AktivitetsplanProducer(
     private val producer: Producer<String, String>,
@@ -37,19 +37,19 @@ class AktivitetsplanProducer(
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.avtaleId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
-        log.info("Skulle egentlig sendt melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
-//        producer.send(record) { recordMetadata, exception ->
-//            when (exception) {
-//                null -> {
-//                    log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
-//                    // Oppdatere sendt til true
-//                    database.settEntitetTilSendt(entitet.id)
-//                }
-//                else -> {
-//                    log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-//                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
-//                }
-//            }
-//        }
+        log.info("Sender melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
+        producer.send(record) { recordMetadata, exception ->
+            when (exception) {
+                null -> {
+                    log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
+                    // Oppdatere sendt til true
+                    database.settEntitetTilSendt(entitet.id)
+                }
+                else -> {
+                    log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
+                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
+                }
+            }
+        }
     }
 }
