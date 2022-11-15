@@ -45,13 +45,13 @@ data class AktivitetsKort(
 
         private fun aktivitetStatusFraAvtaleStatus(avtaleStatus: AvtaleStatus): AktivitetStatus {
             return when (avtaleStatus) {
-                AvtaleStatus.ANNULLERT -> AktivitetStatus.FULLFØRT
-                AvtaleStatus.AVBRUTT -> AktivitetStatus.FULLFØRT
-                AvtaleStatus.PÅBEGYNT -> AktivitetStatus.PLANLEGGER
-                AvtaleStatus.MANGLER_GODKJENNING -> AktivitetStatus.PLANLEGGER
-                AvtaleStatus.KLAR_FOR_OPPSTART -> AktivitetStatus.PLANLEGGER
-                AvtaleStatus.GJENNOMFØRES -> AktivitetStatus.GJENNOMFØRER
-                AvtaleStatus.AVSLUTTET -> AktivitetStatus.FULLFØRT
+                AvtaleStatus.ANNULLERT -> AktivitetStatus.FULLFORT
+                AvtaleStatus.AVBRUTT -> AktivitetStatus.FULLFORT
+                AvtaleStatus.PÅBEGYNT -> AktivitetStatus.PLANLAGT
+                AvtaleStatus.MANGLER_GODKJENNING -> AktivitetStatus.PLANLAGT
+                AvtaleStatus.KLAR_FOR_OPPSTART -> AktivitetStatus.PLANLAGT
+                AvtaleStatus.GJENNOMFØRES -> AktivitetStatus.GJENNOMFORES
+                AvtaleStatus.AVSLUTTET -> AktivitetStatus.FULLFORT
             }
         }
 
