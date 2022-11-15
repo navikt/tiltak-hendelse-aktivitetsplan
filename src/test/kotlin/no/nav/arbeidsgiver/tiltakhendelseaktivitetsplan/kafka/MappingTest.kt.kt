@@ -133,7 +133,7 @@ class MappingTest {
             Ident("Z123456", IdentType.NAVIDENT),
             Instant.now(),
             true,
-            "Hepp"
+            //"Hepp"
         )
 
         val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "TEAM_TILTAK", "UPSERT_AKTIVITETSKORT_V1", "MIDL_LONNSTILSK", aktivitetsKort)
