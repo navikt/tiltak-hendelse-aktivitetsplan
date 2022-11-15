@@ -37,7 +37,6 @@ class AktivitetsplanProducer(
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.avtaleId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
-        log.info("Sender melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
         producer.send(record) { recordMetadata, exception ->
             when (exception) {
                 null -> {

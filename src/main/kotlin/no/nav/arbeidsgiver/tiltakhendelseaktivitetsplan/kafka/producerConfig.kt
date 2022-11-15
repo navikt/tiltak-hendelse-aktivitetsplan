@@ -17,6 +17,7 @@ fun producerConfig() = Properties().apply {
     put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, System.getenv("KAFKA_TRUSTSTORE_PATH"))
     put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, System.getenv("KAFKA_CREDSTORE_PASSWORD"))
     put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12")
+    put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "jks");
     put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, System.getenv("KAFKA_KEYSTORE_PATH"))
     put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, System.getenv("KAFKA_CREDSTORE_PASSWORD"))
 }
