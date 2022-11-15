@@ -45,7 +45,7 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
     }
 }
 fun main() {
-    val schema = JSONSchema.parseFile("src/main/resources/schema.json")
+    val schema = JSONSchema.parseFile("schema.json")
     // Setup kafka and database
     val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
     val producer: Producer<String, String> = KafkaProducer(producerConfig())
