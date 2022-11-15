@@ -1,2 +1,3 @@
 *
+!src/main/resources/schema.json
 !target/tiltak-hendelse-aktivitetsplan*jar
