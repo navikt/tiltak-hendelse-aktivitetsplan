@@ -129,7 +129,7 @@ class MappingTest {
             "En tittel",
             "En beskrivelse",
             AktivitetStatus.FULLFORT,
-            Ident("Z123456", IdentType.navIdent),
+            Ident("Z123456", IdentType.NAVIDENT),
             Instant.now(),
             true,
             "Hepp"
