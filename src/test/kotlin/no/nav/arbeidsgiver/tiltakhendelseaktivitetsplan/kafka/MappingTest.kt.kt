@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import net.pwall.json.schema.JSONSchema
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.time.LocalDate
@@ -135,13 +136,21 @@ class MappingTest {
             "Hepp"
         )
 
-        val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "source", "actionType", "aktivitetskortType", aktivitetsKort)
+        val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "TEAM_TILTAK", "UPSERT_AKTIVITETSKORT_V1", "MIDL_LONNSTILSK", aktivitetsKort)
+
+        val schema = JSONSchema.parseFile("src/test/resources/schema.json")
+
 
         val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(JavaTimeModule())
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         val json = mapper.writeValueAsString(aktivitetsplanMelding)
+        val output = schema.validateBasic(json)
+        output.errors?.forEach {
+            println("${it.error} - ${it.instanceLocation}")
+        }
+        require(schema.validate(json))
         println(json)
 
     }

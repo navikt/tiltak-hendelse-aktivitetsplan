@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
@@ -16,7 +17,8 @@ private const val AKTIVITETSPLAN_TOPIC = "dab.aktivitetskort-v1"
 
 class AktivitetsplanProducer(
     private val producer: Producer<String, String>,
-    private val database: Database
+    private val database: Database,
+    private val schema: JSONSchema
 ) {
     private val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .registerModule(JavaTimeModule())
@@ -35,6 +37,8 @@ class AktivitetsplanProducer(
             "MIDL_LONNSTILSK", // må sjekke
             aktivitetsKort)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
+
+        require(schema.validate(meldingJson))
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.avtaleId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
         producer.send(record) { recordMetadata, exception ->

@@ -14,7 +14,7 @@ data class AktivitetsKort(
     val beskrivelse: String,
     val aktivitetStatus: AktivitetStatus,
     val endretAv: Ident,
-    val endretDato: Instant,
+    val endretTidspunkt: Instant,
     val avtaltMedNav: Boolean,
     val avsluttetBegrunnelse: String,
 
@@ -32,7 +32,7 @@ data class AktivitetsKort(
                 beskrivelse = "Dette er en beskrivelse",
                 aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
-                endretDato = melding.sistEndret,
+                endretTidspunkt = melding.sistEndret,
                 avtaltMedNav = true,
                 avsluttetBegrunnelse = ""
             )
