@@ -16,7 +16,7 @@ data class AktivitetsKort(
     val endretAv: Ident,
     val endretTidspunkt: Instant,
     val avtaltMedNav: Boolean,
-    val avsluttetBegrunnelse: String,
+    val avsluttetBegrunnelse: String?,
 
     // Attributter, lenker og lignende
 
@@ -34,7 +34,7 @@ data class AktivitetsKort(
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
                 endretTidspunkt = melding.sistEndret,
                 avtaltMedNav = true,
-                avsluttetBegrunnelse = ""
+                avsluttetBegrunnelse = null
             )
         }
 
