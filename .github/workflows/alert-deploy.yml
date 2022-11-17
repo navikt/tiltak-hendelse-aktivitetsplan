@@ -5,9 +5,9 @@ on:
     branches:
       - 'main'
     paths:
-      - 'alert-deploy.yaml'
-      - '.github/workflows/alert-deploy.yaml'
-      - 'nais/alerts.yaml'
+      - 'alert-deploy.yml'
+      - '.github/workflows/alert-deploy.yml'
+      - '.nais/alerts.yaml'
 
 jobs:
   deploy-alerts-prod:
