@@ -1,5 +1,8 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Oppgave
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.OppgaveLenke
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -16,6 +19,7 @@ data class AktivitetsKort(
     val endretAv: Ident,
     val endretTidspunkt: Instant,
     val avtaltMedNav: Boolean,
+    val oppgave: Oppgave
     //val avsluttetBegrunnelse: String?,
 
     // Attributter, lenker og lignende
@@ -34,8 +38,17 @@ data class AktivitetsKort(
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
                 endretTidspunkt = melding.sistEndret,
                 avtaltMedNav = melding.veilederNavIdent != null,
+                oppgave = lagOppgave(melding.avtaleId)
                 //avsluttetBegrunnelse = null
             )
+        }
+
+        private fun lagOppgave(avtaleId: UUID): Oppgave {
+            val internAvtalePath = if (Cluster.current == Cluster.PROD_GCP) "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
+            val eksternAvtalePath = if (Cluster.current == Cluster.PROD_GCP) "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/${avtaleId}"
+            val internOppgaveLenke = OppgaveLenke(tekst = "Gå til avtalen", subtekst = "Trykk her", path = internAvtalePath)
+            val eksternOppgaveLenke = OppgaveLenke(tekst = "Gå til avtalen", subtekst = "Trykk her", path = eksternAvtalePath)
+            return Oppgave(ekstern = eksternOppgaveLenke, intern = internOppgaveLenke)
         }
 
         private fun endretAvAktivitetsplanformat(utførtAv: String, utførtAvRolle: AvtaleHendelseUtførtAvRolle): Ident {

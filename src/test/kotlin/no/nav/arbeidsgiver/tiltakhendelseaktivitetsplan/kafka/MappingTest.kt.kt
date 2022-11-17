@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import net.pwall.json.schema.JSONSchema
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Oppgave
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.OppgaveLenke
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.time.LocalDate
@@ -123,16 +125,17 @@ class MappingTest {
     @Test
     fun melding_til_aktivitetsplan_skal_serialiseres() {
         val aktivitetsKort = AktivitetsKort(
-            UUID.randomUUID(),
-            "12345678901",
-            LocalDate.now(),
-            LocalDate.now(),
-            "En tittel",
+            id = UUID.randomUUID(),
+            personIdent = "12345678901",
+            startDato = LocalDate.now(),
+            sluttDato = LocalDate.now(),
+            tittel = "En tittel",
            // "En beskrivelse",
-            AktivitetStatus.FULLFORT,
-            Ident("Z123456", IdentType.NAVIDENT),
-            Instant.now(),
-            true,
+            aktivitetStatus = AktivitetStatus.FULLFORT,
+            endretAv = Ident("Z123456", IdentType.NAVIDENT),
+            endretTidspunkt = Instant.now(),
+            avtaltMedNav = true,
+            oppgave = Oppgave(ekstern = OppgaveLenke("", "", ""), intern = OppgaveLenke("", "", ""))
             //"Hepp"
         )
 
