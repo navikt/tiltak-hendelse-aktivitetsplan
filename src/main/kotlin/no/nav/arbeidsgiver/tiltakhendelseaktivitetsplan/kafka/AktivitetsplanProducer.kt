@@ -9,6 +9,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -43,16 +44,18 @@ class AktivitetsplanProducer(
         require(schema.validate(meldingJson))
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaMeldingId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
-        producer.send(record) { recordMetadata, exception ->
-            when (exception) {
-                null -> {
-                    log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
-                    // Oppdatere sendt til true
-                    database.settEntitetTilSendt(entitet.id)
-                }
-                else -> {
-                    log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
+        if(Cluster.current != Cluster.PROD_GCP) {
+            producer.send(record) { recordMetadata, exception ->
+                when (exception) {
+                    null -> {
+                        log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
+                        // Oppdatere sendt til true
+                        database.settEntitetTilSendt(entitet.id)
+                    }
+                    else -> {
+                        log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
+                        database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
+                    }
                 }
             }
         }
