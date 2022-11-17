@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
+import java.util.UUID
 
 private const val AKTIVITETSPLAN_TOPIC = "dab.aktivitetskort-v1"
 
@@ -29,9 +30,10 @@ class AktivitetsplanProducer(
     fun sendMelding(entitet: AktivitetsplanMeldingEntitet) {
         log.info("Sender melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
         val melding: AvtaleHendelseMelding = mapper.readValue(entitet.mottattJson)
+        val kafkaMeldingId = UUID.randomUUID()
         val aktivitetsKort = AktivitetsKort.fromHendelseMelding(melding)
         val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(
-            melding.avtaleId,
+            kafkaMeldingId,
             "TEAM_TILTAK",
             "UPSERT_AKTIVITETSKORT_V1",
             "MIDL_LONNSTILSK", // må sjekke
@@ -39,7 +41,7 @@ class AktivitetsplanProducer(
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
 
         require(schema.validate(meldingJson))
-        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, melding.avtaleId.toString(), meldingJson)
+        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaMeldingId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
         producer.send(record) { recordMetadata, exception ->
             when (exception) {
