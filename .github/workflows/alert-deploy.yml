@@ -1,0 +1,22 @@
+name: Deploy av alerts
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths:
+      - 'alert-deploy.yaml'
+      - '.github/workflows/alert-deploy.yaml'
+      - 'nais/alerts.yaml'
+
+jobs:
+  deploy-alerts-prod:
+    name: Deploy alerts til prod gcp
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-gcp
+          RESOURCE: nais/alerts.yaml
