@@ -33,7 +33,7 @@ data class AktivitetsKort(
                 aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
                 endretTidspunkt = melding.sistEndret,
-                avtaltMedNav = true,
+                avtaltMedNav = melding.veilederNavIdent != null,
                 //avsluttetBegrunnelse = null
             )
         }
@@ -45,13 +45,13 @@ data class AktivitetsKort(
 
         private fun aktivitetStatusFraAvtaleStatus(avtaleStatus: AvtaleStatus): AktivitetStatus {
             return when (avtaleStatus) {
-                AvtaleStatus.ANNULLERT -> AktivitetStatus.FULLFORT
-                AvtaleStatus.AVBRUTT -> AktivitetStatus.FULLFORT
                 AvtaleStatus.PÅBEGYNT -> AktivitetStatus.PLANLAGT
                 AvtaleStatus.MANGLER_GODKJENNING -> AktivitetStatus.PLANLAGT
                 AvtaleStatus.KLAR_FOR_OPPSTART -> AktivitetStatus.PLANLAGT
                 AvtaleStatus.GJENNOMFØRES -> AktivitetStatus.GJENNOMFORES
                 AvtaleStatus.AVSLUTTET -> AktivitetStatus.FULLFORT
+                AvtaleStatus.ANNULLERT -> AktivitetStatus.AVBRUTT
+                AvtaleStatus.AVBRUTT -> AktivitetStatus.AVBRUTT
             }
         }
 
