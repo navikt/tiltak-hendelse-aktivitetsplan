@@ -1,8 +1,10 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
+import io.ktor.server.util.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Oppgave
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.OppgaveLenke
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
+import java.net.URL
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -46,8 +48,8 @@ data class AktivitetsKort(
         private fun lagOppgave(avtaleId: UUID): Oppgave {
             val internAvtalePath = if (Cluster.current == Cluster.PROD_GCP) "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
             val eksternAvtalePath = if (Cluster.current == Cluster.PROD_GCP) "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/${avtaleId}"
-            val internOppgaveLenke = OppgaveLenke(tekst = "Gå til avtalen", subtekst = "Trykk her", path = internAvtalePath)
-            val eksternOppgaveLenke = OppgaveLenke(tekst = "Gå til avtalen", subtekst = "Trykk her", path = eksternAvtalePath)
+            val internOppgaveLenke = OppgaveLenke(tekst = "Gå til avtalen", subtekst = "Trykk her", url = URL(internAvtalePath), knapptekst = "Gå til avtalen")
+            val eksternOppgaveLenke = OppgaveLenke(tekst = "Gå til avtalen", subtekst = "Trykk her", url = URL(eksternAvtalePath), knapptekst = "Gå til avtalen")
             return Oppgave(ekstern = eksternOppgaveLenke, intern = internOppgaveLenke)
         }
 

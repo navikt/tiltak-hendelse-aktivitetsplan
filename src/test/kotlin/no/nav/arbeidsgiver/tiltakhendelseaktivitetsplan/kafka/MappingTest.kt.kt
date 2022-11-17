@@ -10,6 +10,7 @@ import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Oppgave
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.OppgaveLenke
 import org.junit.jupiter.api.Test
+import java.net.URL
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
@@ -135,7 +136,7 @@ class MappingTest {
             endretAv = Ident("Z123456", IdentType.NAVIDENT),
             endretTidspunkt = Instant.now(),
             avtaltMedNav = true,
-            oppgave = Oppgave(ekstern = OppgaveLenke("", "", ""), intern = OppgaveLenke("", "", ""))
+            oppgave = Oppgave(ekstern = OppgaveLenke("", "", URL(""), knapptekst = ""), intern = OppgaveLenke("", "", URL(""), knapptekst = ""))
             //"Hepp"
         )
 
