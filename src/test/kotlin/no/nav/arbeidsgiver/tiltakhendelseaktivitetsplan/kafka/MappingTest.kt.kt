@@ -128,7 +128,7 @@ class MappingTest {
             LocalDate.now(),
             LocalDate.now(),
             "En tittel",
-            "En beskrivelse",
+           // "En beskrivelse",
             AktivitetStatus.FULLFORT,
             Ident("Z123456", IdentType.NAVIDENT),
             Instant.now(),
