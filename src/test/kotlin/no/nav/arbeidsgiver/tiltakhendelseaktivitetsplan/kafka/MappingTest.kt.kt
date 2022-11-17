@@ -136,7 +136,7 @@ class MappingTest {
             endretAv = Ident("Z123456", IdentType.NAVIDENT),
             endretTidspunkt = Instant.now(),
             avtaltMedNav = true,
-            oppgave = Oppgave(ekstern = OppgaveLenke("", "", URL(""), knapptekst = ""), intern = OppgaveLenke("", "", URL(""), knapptekst = ""))
+            oppgave = Oppgave(ekstern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = ""), intern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = ""))
             //"Hepp"
         )
 
