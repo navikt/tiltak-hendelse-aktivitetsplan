@@ -12,11 +12,11 @@ spec:
       channel: arbeidsgiver-tiltak-alerts
       prependText: '<!here> | '
   alerts:
-    - alert: tiltak-hendelse-aktivitetsplan er nede
-      expr: sum(up{app="tiltak-hendelse-aktivitetsplan", job="kubernetes-pods"}) == 0
-      for: 2m
-      description: "App tiltak-hendelse-aktivitetsplan er nede! :sadpanda:"
-      action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for logger"
+#    - alert: tiltak-hendelse-aktivitetsplan er nede
+#      expr: sum(up{app="tiltak-hendelse-aktivitetsplan", job="kubernetes-pods"}) == 0
+#      for: 2m
+#      description: "App tiltak-hendelse-aktivitetsplan er nede! :sadpanda:"
+#      action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for logger"
     - alert: Det har skjedd en feil i tiltak-hendelse-aktivitetsplan, logget med level Error
       expr: sum(increase(logd_messages_total{log_app="tiltak-hendelse-aktivitetsplan",log_level="Error"}[10m])) > 0
       for: 10s
