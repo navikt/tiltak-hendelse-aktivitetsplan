@@ -32,9 +32,13 @@ class AvtaleHendelseConsumer(
             records.forEach {
                 val melding: AvtaleHendelseMelding = mapper.readValue(it.value())
                 log.info("Lest melding med avtale-id ${melding.avtaleId}")
-                // Filtrere de som skal til aktivitetplan
+                // Filtrere vekk de som ikke skal til aktivitetplan
                 if (!melding.hendelseType.skalTilAktivitetsplan) {
                     log.info("melding med hendelsetype ${melding.hendelseType} skal ikke til aktivitetsplan")
+                    return@forEach
+                }
+                if (!melding.tiltakstype.skalTilAktivitetsplan) {
+                    log.info("melding med tiltakstype ${melding.tiltakstype} skal ikke til aktivitetsplan")
                     return@forEach
                 }
 
