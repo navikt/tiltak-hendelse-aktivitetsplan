@@ -6,5 +6,5 @@ enum class Tiltakstype(val beskrivelse: String, val skalTilAktivitetsplan: Boole
     VARIG_LONNSTILSKUDD("Varig lønnstilskudd", true),
     MENTOR("Mentor", false),
     INKLUDERINGSTILSKUDD("Inkluderingstilskudd", false),
-    SOMMERJOBB("Sommerjobb", true);
+    SOMMERJOBB("Sommerjobb", false);
 }
