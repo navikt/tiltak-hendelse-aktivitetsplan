@@ -22,7 +22,7 @@ data class AktivitetsKort(
     val endretAv: Ident,
     val endretTidspunkt: Instant,
     val avtaltMedNav: Boolean,
-    val oppgave: Oppgave,
+    val oppgaver: Oppgave,
     val handlinger: List<LenkeSeksjon>
     //val avsluttetBegrunnelse: String?,
 
@@ -42,7 +42,7 @@ data class AktivitetsKort(
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
                 endretTidspunkt = melding.sistEndret,
                 avtaltMedNav = melding.veilederNavIdent != null,
-                oppgave = lagOppgave(melding.avtaleId),
+                oppgaver = lagOppgave(melding.avtaleId),
                 handlinger = listOf(
                     LenkeSeksjon("Gå til avtalen", "", lenke("INTERN"), LenkeType.INTERN),
                     LenkeSeksjon("Gå til avtalen", "", lenke("EKSTERN"), LenkeType.EKSTERN)
