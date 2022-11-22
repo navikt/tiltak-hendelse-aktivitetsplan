@@ -7,6 +7,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import net.pwall.json.schema.JSONSchema
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeSeksjon
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeType
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Oppgave
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.OppgaveLenke
 import org.junit.jupiter.api.Test
@@ -136,7 +138,8 @@ class MappingTest {
             endretAv = Ident("Z123456", IdentType.NAVIDENT),
             endretTidspunkt = Instant.now(),
             avtaltMedNav = true,
-            oppgave = Oppgave(ekstern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = ""), intern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = ""))
+            oppgave = Oppgave(ekstern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = ""), intern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = "")),
+            handlinger = listOf(LenkeSeksjon("Gå til avtale", "", URL("https://lalalala.no"), LenkeType.INTERN))
             //"Hepp"
         )
 
