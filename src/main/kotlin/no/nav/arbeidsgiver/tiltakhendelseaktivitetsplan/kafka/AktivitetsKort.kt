@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
-import io.ktor.server.util.*
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeSeksjon
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeType
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Oppgave
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.OppgaveLenke
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
@@ -16,31 +17,36 @@ data class AktivitetsKort(
     val startDato: LocalDate?,
     val sluttDato: LocalDate?,
     val tittel: String,
-   // val beskrivelse: String,
+    // val beskrivelse: String,
     val aktivitetStatus: AktivitetStatus,
     val endretAv: Ident,
     val endretTidspunkt: Instant,
     val avtaltMedNav: Boolean,
-    val oppgave: Oppgave
+    val oppgave: Oppgave,
+    val handlinger: List<LenkeSeksjon>
     //val avsluttetBegrunnelse: String?,
 
     // Attributter, lenker og lignende
 
 ) {
     companion object {
-        fun fromHendelseMelding(melding: AvtaleHendelseMelding) : AktivitetsKort {
+        fun fromHendelseMelding(melding: AvtaleHendelseMelding): AktivitetsKort {
             return AktivitetsKort(
                 id = melding.avtaleId,
                 personIdent = melding.deltakerFnr,
                 startDato = melding.startDato,
                 sluttDato = melding.sluttDato,
                 tittel = "Avtale om ${melding.tiltakstype.beskrivelse}",
-              //  beskrivelse = "Dette er en beskrivelse",
+                //  beskrivelse = "Dette er en beskrivelse",
                 aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
                 endretTidspunkt = melding.sistEndret,
                 avtaltMedNav = melding.veilederNavIdent != null,
-                oppgave = lagOppgave(melding.avtaleId)
+                oppgave = lagOppgave(melding.avtaleId),
+                handlinger = listOf(
+                    LenkeSeksjon("Gå til avtalen", null, lenke("INTERN"), LenkeType.INTERN),
+                    LenkeSeksjon("Gå til avtalen", null, lenke("EKSTERN"), LenkeType.EKSTERN)
+                )
                 //avsluttetBegrunnelse = null
             )
         }
@@ -58,15 +64,28 @@ data class AktivitetsKort(
         }
 
         private fun lagOppgave(avtaleId: UUID): Oppgave {
-            val internAvtalePath = if (Cluster.current == Cluster.PROD_GCP) "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
-            val eksternAvtalePath = if (Cluster.current == Cluster.PROD_GCP) "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/${avtaleId}"
-            val internOppgaveLenke = OppgaveLenke(tekst = "Gå til avtalen", subtekst = "Trykk her", url = URL(internAvtalePath), knapptekst = "Gå til avtalen")
-            val eksternOppgaveLenke = OppgaveLenke(tekst = "Gå til avtalen", subtekst = "Trykk her", url = URL(eksternAvtalePath), knapptekst = "Gå til avtalen")
+            val internAvtalePath =
+                if (Cluster.current == Cluster.PROD_GCP) "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
+            val eksternAvtalePath =
+                if (Cluster.current == Cluster.PROD_GCP) "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/${avtaleId}"
+            val internOppgaveLenke = OppgaveLenke(
+                tekst = "Gå til avtalen",
+                subtekst = "Trykk her",
+                url = URL(internAvtalePath),
+                knapptekst = "Gå til avtalen"
+            )
+            val eksternOppgaveLenke = OppgaveLenke(
+                tekst = "Gå til avtalen",
+                subtekst = "Trykk her",
+                url = URL(eksternAvtalePath),
+                knapptekst = "Gå til avtalen"
+            )
             return Oppgave(ekstern = eksternOppgaveLenke, intern = internOppgaveLenke)
         }
 
         private fun endretAvAktivitetsplanformat(utførtAv: String, utførtAvRolle: AvtaleHendelseUtførtAvRolle): Ident {
-            val identType = if (utførtAvRolle == AvtaleHendelseUtførtAvRolle.VEILEDER) IdentType.NAVIDENT else IdentType.ARBEIDSGIVER
+            val identType =
+                if (utførtAvRolle == AvtaleHendelseUtførtAvRolle.VEILEDER) IdentType.NAVIDENT else IdentType.ARBEIDSGIVER
             return Ident(utførtAv, identType)
         }
 
