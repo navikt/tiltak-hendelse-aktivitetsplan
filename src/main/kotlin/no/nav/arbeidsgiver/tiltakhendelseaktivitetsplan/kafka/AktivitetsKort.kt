@@ -45,6 +45,18 @@ data class AktivitetsKort(
             )
         }
 
+        private fun lenke(side: String): URL {
+            val internDev = "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/"
+            val internProd = "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/"
+            val eksternDev = "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/"
+            val eksternProd = "https://arbeidsgiver.nav.no/tiltaksgjennomforing/"
+            if (Cluster.current == Cluster.PROD_GCP) {
+                return if (side == "INTERN") URL(internProd) else URL(eksternProd)
+            } else {
+                return if (side == "INTERN") URL(internDev) else URL(eksternDev)
+            }
+        }
+
         private fun lagOppgave(avtaleId: UUID): Oppgave {
             val internAvtalePath = if (Cluster.current == Cluster.PROD_GCP) "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
             val eksternAvtalePath = if (Cluster.current == Cluster.PROD_GCP) "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/${avtaleId}"
