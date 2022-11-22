@@ -4,7 +4,7 @@ import java.net.URL
 
 data class LenkeSeksjon(
     val tekst: String,
-    val subtekst: String?,
+    val subtekst: String,
     val url: URL,
     val type: LenkeType
 )

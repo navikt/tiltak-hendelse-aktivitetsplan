@@ -44,8 +44,8 @@ data class AktivitetsKort(
                 avtaltMedNav = melding.veilederNavIdent != null,
                 oppgave = lagOppgave(melding.avtaleId),
                 handlinger = listOf(
-                    LenkeSeksjon("Gå til avtalen", null, lenke("INTERN"), LenkeType.INTERN),
-                    LenkeSeksjon("Gå til avtalen", null, lenke("EKSTERN"), LenkeType.EKSTERN)
+                    LenkeSeksjon("Gå til avtalen", "", lenke("INTERN"), LenkeType.INTERN),
+                    LenkeSeksjon("Gå til avtalen", "", lenke("EKSTERN"), LenkeType.EKSTERN)
                 )
                 //avsluttetBegrunnelse = null
             )
