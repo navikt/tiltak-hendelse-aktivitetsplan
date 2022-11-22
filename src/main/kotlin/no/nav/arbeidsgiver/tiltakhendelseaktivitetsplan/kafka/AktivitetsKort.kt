@@ -1,9 +1,6 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeSeksjon
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeType
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Oppgave
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.OppgaveLenke
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import java.net.URL
 import java.time.Instant
@@ -23,7 +20,8 @@ data class AktivitetsKort(
     val endretTidspunkt: Instant,
     val avtaltMedNav: Boolean,
     val oppgaver: Oppgave,
-    val handlinger: List<LenkeSeksjon>
+    val handlinger: List<LenkeSeksjon>,
+    val detaljer: List<Attributt>
     //val avsluttetBegrunnelse: String?,
 
     // Attributter, lenker og lignende
@@ -46,9 +44,19 @@ data class AktivitetsKort(
                 handlinger = listOf(
                     LenkeSeksjon("Gå til avtalen", "", lenke("INTERN"), LenkeType.INTERN),
                     LenkeSeksjon("Gå til avtalen", "", lenke("EKSTERN"), LenkeType.EKSTERN)
+                ),
+                detaljer = listOf(
+                    lagAttributt(label = "Arbeidsgiver", verdi = melding.bedriftNavn),
+                    lagAttributt(label = "Stilling", verdi = melding.stillingstittel),
+                    lagAttributt(label = "Stillingsprosent", verdi = melding.stillingprosent?.toString())
                 )
                 //avsluttetBegrunnelse = null
             )
+        }
+
+        private fun lagAttributt(label: String, verdi: String?): Attributt {
+            val feltVerdi = if (verdi !== null) verdi.toString() else "Ikke fylt ut";
+            return Attributt(label = label, verdi = feltVerdi)
         }
 
         private fun lenke(side: String): URL {
