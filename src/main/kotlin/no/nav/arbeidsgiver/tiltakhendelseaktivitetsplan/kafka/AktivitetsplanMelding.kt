@@ -10,8 +10,8 @@ data class AktivitetsplanMelding(
     val aktivitetskort: AktivitetsKort
 ) {
     companion object {
-        fun fromAktivitetskort(messageId: UUID, source: String, actionType: String, aktivitetskortType: String, aktivitetskort: AktivitetsKort): AktivitetsplanMelding {
-            return AktivitetsplanMelding(messageId, source, actionType, aktivitetskortType, aktivitetskort)
+        fun fromAktivitetskort(messageId: UUID, source: String, actionType: String, aktivitetskortType: Tiltakstype, aktivitetskort: AktivitetsKort): AktivitetsplanMelding {
+            return AktivitetsplanMelding(messageId, source, actionType, aktivitetskortType.name, aktivitetskort)
         }
     }
 }

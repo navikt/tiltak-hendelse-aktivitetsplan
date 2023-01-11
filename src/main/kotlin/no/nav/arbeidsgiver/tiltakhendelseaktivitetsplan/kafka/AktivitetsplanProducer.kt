@@ -37,7 +37,7 @@ class AktivitetsplanProducer(
             kafkaMeldingId,
             "TEAM_TILTAK",
             "UPSERT_AKTIVITETSKORT_V1",
-            "MIDL_LONNSTILSK", // må sjekke
+            melding.tiltakstype, // må sjekke
             aktivitetsKort)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
 

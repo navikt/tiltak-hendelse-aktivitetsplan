@@ -141,7 +141,7 @@ class MappingTest {
             //"Hepp"
         )
 
-        val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "TEAM_TILTAK", "UPSERT_AKTIVITETSKORT_V1", "MIDL_LONNSTILSK", aktivitetsKort)
+        val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "TEAM_TILTAK", "UPSERT_AKTIVITETSKORT_V1", Tiltakstype.MIDLERTIDIG_LONNSTILSKUDD, aktivitetsKort)
 
         val schema = JSONSchema.parseFile("src/test/resources/schema.json")
 
