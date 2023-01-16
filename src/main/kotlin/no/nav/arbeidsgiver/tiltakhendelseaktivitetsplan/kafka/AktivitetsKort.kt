@@ -42,8 +42,8 @@ data class AktivitetsKort(
                 avtaltMedNav = melding.veilederNavIdent != null,
                 oppgaver = null,
                 handlinger = listOf(
-                    LenkeSeksjon("Gå til avtalen", "", lenke("INTERN"), LenkeType.INTERN),
-                    LenkeSeksjon("Gå til avtalen", "", lenke("EKSTERN"), LenkeType.EKSTERN)
+                    LenkeSeksjon("Gå til avtalen", "", lenke("INTERN", melding.avtaleId), LenkeType.INTERN),
+                    LenkeSeksjon("Gå til avtalen", "", lenke("EKSTERN", melding.avtaleId), LenkeType.EKSTERN)
                 ),
                 detaljer = listOf(
                     lagAttributt(label = "Arbeidsgiver", verdi = melding.bedriftNavn),
@@ -59,11 +59,11 @@ data class AktivitetsKort(
             return Attributt(label = label, verdi = feltVerdi)
         }
 
-        private fun lenke(side: String): URL {
-            val internDev = "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/"
-            val internProd = "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/"
-            val eksternDev = "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/"
-            val eksternProd = "https://arbeidsgiver.nav.no/tiltaksgjennomforing/"
+        private fun lenke(side: String, avtaleId: UUID): URL {
+            val internDev = "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
+            val internProd = "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
+            val eksternDev = "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
+            val eksternProd = "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
             if (Cluster.current == Cluster.PROD_GCP) {
                 return if (side == "INTERN") URL(internProd) else URL(eksternProd)
             } else {
