@@ -41,7 +41,14 @@ class AktivitetsplanProducer(
             aktivitetsKort)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
 
-        require(schema.validate(meldingJson))
+        if(!schema.validate(meldingJson))  {
+            val output = schema.validateBasic(meldingJson)
+            output.errors?.forEach {
+                log.error("${it.error} - ${it.instanceLocation}")
+            }
+            log.error("")
+            return
+        }
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaMeldingId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
         if(Cluster.current != Cluster.PROD_GCP) {
