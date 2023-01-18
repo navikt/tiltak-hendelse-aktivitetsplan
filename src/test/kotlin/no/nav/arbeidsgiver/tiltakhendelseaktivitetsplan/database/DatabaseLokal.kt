@@ -44,8 +44,8 @@ class DatabaseLokal {
 
     fun lagreNyAvtaleMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
         val query: String = """
-            insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt) values
-            (?, ?, ?, ?, ?, ?, ?, ?)
+            insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt, topic_offset) values
+            (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent();
         using(sessionOf(dataSource)) { session ->
             session.run(queryOf(
@@ -57,7 +57,8 @@ class DatabaseLokal {
                 entitet.hendelseType.name,
                 entitet.mottattJson,
                 entitet.sendingJson,
-                entitet.sendt
+                entitet.sendt,
+                entitet.topicOffset
             ).asUpdate)
         }
         log.info("Lagret avtalemeldingentitet i database")

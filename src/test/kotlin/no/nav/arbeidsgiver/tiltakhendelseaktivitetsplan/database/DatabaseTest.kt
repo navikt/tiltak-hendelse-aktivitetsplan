@@ -17,7 +17,8 @@ class DatabaseTest {
         hendelseType = HendelseType.AVTALE_FORLENGET,
         mottattJson = "",
         sendingJson = "",
-        sendt = false
+        sendt = false,
+        topicOffset = 1235346L
     )
 
     @Test

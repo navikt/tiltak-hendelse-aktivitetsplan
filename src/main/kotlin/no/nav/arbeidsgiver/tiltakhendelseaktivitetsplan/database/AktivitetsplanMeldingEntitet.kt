@@ -15,7 +15,7 @@ data class AktivitetsplanMeldingEntitet (
     val mottattJson: String,
     val sendingJson: String?,
     val sendt: Boolean,
-    val offset: Long
+    val topicOffset: Long
 )
 
 val tilAktivitetsplanMeldingEntitet: (Row) -> AktivitetsplanMeldingEntitet = { row ->
@@ -28,7 +28,7 @@ val tilAktivitetsplanMeldingEntitet: (Row) -> AktivitetsplanMeldingEntitet = { r
         mottattJson = row.string("mottatt_json"),
         sendingJson = row.string("sending_json"),
         sendt = row.boolean("sendt"),
-        offset = row.long("offset")
+        topicOffset = row.long("topic_offset")
     )
 }
 

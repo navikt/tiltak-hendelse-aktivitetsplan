@@ -34,7 +34,7 @@ class Database {
 
     fun lagreNyAktivitetsplanMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
         val query: String = """
-            insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt, offset) values
+            insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt, topic_offset) values
             (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent();
         using(sessionOf(dataSource)) { session ->
@@ -49,7 +49,7 @@ class Database {
                     entitet.mottattJson,
                     entitet.sendingJson,
                     entitet.sendt,
-                    entitet.offset
+                    entitet.topicOffset
                 ).asUpdate
             )
         }

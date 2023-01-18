@@ -52,7 +52,7 @@ class AvtaleHendelseConsumer(
                     mottattJson = it.value(),
                     sendingJson = null,
                     sendt = false,
-                    offset = it.offset()
+                    topicOffset = it.offset()
                 )
                 database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
                 consumer.commitAsync()
