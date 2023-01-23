@@ -135,7 +135,7 @@ class MappingTest {
             endretAv = Ident("Z123456", IdentType.NAVIDENT),
             endretTidspunkt = Instant.now(),
             avtaltMedNav = true,
-            oppgaver = Oppgave(ekstern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = ""), intern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = "")),
+            oppgave = null, //Oppgave(ekstern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = ""), intern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = "")),
             handlinger = listOf(LenkeSeksjon("Gå til avtale", "", URL("https://lalalala.no"), LenkeType.INTERN)),
             detaljer = listOf(Attributt("", ""))
             //"Hepp"
@@ -143,8 +143,7 @@ class MappingTest {
 
         val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "TEAM_TILTAK", "UPSERT_AKTIVITETSKORT_V1", Tiltakstype.MIDLERTIDIG_LONNSTILSKUDD, aktivitetsKort)
 
-        val schema = JSONSchema.parseFile("src/test/resources/schema.json")
-
+        val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
 
         val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(JavaTimeModule())

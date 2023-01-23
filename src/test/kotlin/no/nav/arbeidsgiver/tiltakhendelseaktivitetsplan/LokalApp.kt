@@ -12,7 +12,7 @@ import org.h2.tools.Server
 import java.io.File
 
 fun main() {
-    val schema = JSONSchema.parseFile("src/test/resources/schema.json")
+    val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
     // Testoppsett
     val consumer: Consumer<String, String> = KafkaConsumer(testConsumerConfig())
     val producer: Producer<String, String> = KafkaProducer(testProducerConfig())

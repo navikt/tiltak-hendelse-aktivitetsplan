@@ -6,7 +6,7 @@ data class LenkeSeksjon(
     val tekst: String,
     val subtekst: String,
     val url: URL,
-    val type: LenkeType
+    val lenkeType: LenkeType
 )
 
 enum class LenkeType {
