@@ -92,8 +92,13 @@ data class AktivitetsKort(
         }
 
         private fun endretAvAktivitetsplanformat(utførtAv: String, utførtAvRolle: AvtaleHendelseUtførtAvRolle): Ident {
-            val identType =
-                if (utførtAvRolle == AvtaleHendelseUtførtAvRolle.VEILEDER) IdentType.NAVIDENT else IdentType.ARBEIDSGIVER
+            val identType = when(utførtAvRolle) {
+                AvtaleHendelseUtførtAvRolle.VEILEDER -> IdentType.NAVIDENT
+                AvtaleHendelseUtførtAvRolle.BESLUTTER -> IdentType.NAVIDENT
+                AvtaleHendelseUtførtAvRolle.ARBEIDSGIVER -> IdentType.ARBEIDSGIVER
+                AvtaleHendelseUtførtAvRolle.SYSTEM -> IdentType.SYSTEM
+            }
+
             return Ident(utførtAv, identType)
         }
 
