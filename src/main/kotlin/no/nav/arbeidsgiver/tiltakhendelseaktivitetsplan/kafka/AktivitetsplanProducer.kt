@@ -57,7 +57,7 @@ class AktivitetsplanProducer(
                     null -> {
                         log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
                         // Oppdatere sendt til true
-                        database.settEntitetTilSendt(entitet.id)
+                        database.settEntitetTilSendt(entitet.id, recordMetadata.offset())
                     }
                     else -> {
                         log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")

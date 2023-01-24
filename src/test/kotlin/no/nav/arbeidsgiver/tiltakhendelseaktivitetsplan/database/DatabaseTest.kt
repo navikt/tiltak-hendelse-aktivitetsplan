@@ -5,7 +5,9 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.HendelseType
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class DatabaseTest {
 
@@ -18,15 +20,42 @@ class DatabaseTest {
         mottattJson = "",
         sendingJson = "",
         sendt = false,
-        topicOffset = 1235346L
+        topicOffset = 1235346L,
+        producerTopicOffset = 54321L
+    )
+
+    val entitet2 = AktivitetsplanMeldingEntitet(
+        id = UUID.fromString("66276156-9bc6-11ed-a8fc-0242ac120002"),
+        avtaleId = UUID.fromString("66276156-9bc6-11ed-a8fc-0242ac120002"),
+        avtaleStatus = AvtaleStatus.GJENNOMFØRES,
+        opprettetTidspunkt = LocalDateTime.now(),
+        hendelseType = HendelseType.AVTALE_FORLENGET,
+        mottattJson = "",
+        sendingJson = "",
+        sendt = false,
+        topicOffset = 1235346L,
+        producerTopicOffset = 54321L
     )
 
     @Test
     fun skal_kunne_lagre_og_hente_entiteter() {
-        val database = DatabaseLokal()
-        database.lagreNyAvtaleMeldingEntitet(entitet)
+        val database = Database(testDataSource)
+        database.lagreNyAktivitetsplanMeldingEntitet(entitet)
         val aktivitetsplanMeldingEntitet = database.hentEntitet(UUID.fromString("6cb7a6ce-59d7-11ed-9b6a-0242ac120002"))
         assertNotNull(aktivitetsplanMeldingEntitet)
+    }
+
+    @Test
+    fun skal_kunne_oppdatere_entitet_til_sendt() {
+        val database = Database(testDataSource)
+        database.lagreNyAktivitetsplanMeldingEntitet(entitet2)
+        database.settEntitetTilSendt(UUID.fromString("66276156-9bc6-11ed-a8fc-0242ac120002"), 1337L)
+        val aktivitetsplanMeldingEntitet = database.hentEntitet(UUID.fromString("66276156-9bc6-11ed-a8fc-0242ac120002"))
+        assertNotNull(aktivitetsplanMeldingEntitet)
+        if (aktivitetsplanMeldingEntitet != null) {
+            assertTrue(aktivitetsplanMeldingEntitet.sendt)
+            assertEquals(1337L, aktivitetsplanMeldingEntitet.producerTopicOffset)
+        }
     }
 
 }

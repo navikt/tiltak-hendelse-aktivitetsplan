@@ -9,6 +9,7 @@ import io.ktor.server.routing.*
 import mu.KotlinLogging
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProducer
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseConsumer
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.consumerConfig
@@ -52,7 +53,7 @@ fun main() {
     // Setup kafka and database
     val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
     val producer: Producer<String, String> = KafkaProducer(producerConfig())
-    val database = Database()
+    val database = Database(dataSource)
     val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema)
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
 

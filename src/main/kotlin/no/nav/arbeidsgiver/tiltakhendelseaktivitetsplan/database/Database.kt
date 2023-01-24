@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database
 
+import com.zaxxer.hikari.HikariDataSource
 import kotliquery.HikariCP
 import kotliquery.queryOf
 import kotliquery.sessionOf
@@ -8,21 +9,9 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.flywaydb.core.Flyway
 import java.util.*
 
-class Database {
+class Database(val dataSource: HikariDataSource) {
     //private val dataSource: HikariDataSource = hikari()
-    val DB_HOST = System.getenv("DB_HOST")
-    val DB_PORT = System.getenv("DB_PORT")
-    val DB_DATABASE = System.getenv("DB_DATABASE")
-    val DB_USERNAME = System.getenv("DB_USERNAME")
-    val DB_PASSWORD = System.getenv("DB_PASSWORD")
 
-    val dataSource = HikariCP.init(
-        url = "jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_DATABASE}?user=${DB_USERNAME}&password=${DB_PASSWORD}",
-        username = DB_USERNAME,
-        password = DB_PASSWORD
-    ) {
-        maximumPoolSize = 4
-    }
 
     init {
         val flyway = Flyway.configure()
@@ -34,8 +23,8 @@ class Database {
 
     fun lagreNyAktivitetsplanMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
         val query: String = """
-            insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt, topic_offset) values
-            (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt, topic_offset, producer_topic_offset) values
+            (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent();
         using(sessionOf(dataSource)) { session ->
             session.run(
@@ -49,7 +38,8 @@ class Database {
                     entitet.mottattJson,
                     entitet.sendingJson,
                     entitet.sendt,
-                    entitet.topicOffset
+                    entitet.topicOffset,
+                    entitet.producerTopicOffset
                 ).asUpdate
             )
         }
@@ -63,12 +53,12 @@ class Database {
         }
     }
 
-    fun settEntitetTilSendt(id: UUID) {
+    fun settEntitetTilSendt(id: UUID, offset: Long) {
         val query: String = """
-            update aktivitetsplan_melding set sendt = true, feilmelding = null where id = ?
+            update aktivitetsplan_melding set sendt = true, producer_topic_offset = ?, feilmelding = null where id = ?
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
-            session.run(queryOf(query, id).asUpdate)
+            session.run(queryOf(query, offset, id).asUpdate)
         }
     }
 

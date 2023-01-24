@@ -6,7 +6,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.HendelseType
 import java.time.LocalDateTime
 import java.util.*
 
-data class AktivitetsplanMeldingEntitet (
+data class AktivitetsplanMeldingEntitet(
     val id: UUID,
     val avtaleId: UUID,
     val avtaleStatus: AvtaleStatus,
@@ -15,7 +15,8 @@ data class AktivitetsplanMeldingEntitet (
     val mottattJson: String,
     val sendingJson: String?,
     val sendt: Boolean,
-    val topicOffset: Long
+    val topicOffset: Long,
+    val producerTopicOffset: Long?
 )
 
 val tilAktivitetsplanMeldingEntitet: (Row) -> AktivitetsplanMeldingEntitet = { row ->
@@ -28,7 +29,8 @@ val tilAktivitetsplanMeldingEntitet: (Row) -> AktivitetsplanMeldingEntitet = { r
         mottattJson = row.string("mottatt_json"),
         sendingJson = row.string("sending_json"),
         sendt = row.boolean("sendt"),
-        topicOffset = row.long("topic_offset")
+        topicOffset = row.long("topic_offset"),
+        producerTopicOffset = row.long("producer_topic_offset")
     )
 }
 
