@@ -60,10 +60,10 @@ data class AktivitetsKort(
         }
 
         private fun lenke(side: String, avtaleId: UUID): URL {
-            val internDev = "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
-            val internProd = "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
-            val eksternDev = "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
-            val eksternProd = "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
+            val internDev = "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=VEILEDER"
+            val internProd = "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=VEILEDER"
+            val eksternDev = "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=DELTAKER"
+            val eksternProd = "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=DELTAKER"
             if (Cluster.current == Cluster.PROD_GCP) {
                 return if (side == "INTERN") URL(internProd) else URL(eksternProd)
             } else {
