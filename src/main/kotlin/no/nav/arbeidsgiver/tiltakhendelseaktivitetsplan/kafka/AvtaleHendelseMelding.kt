@@ -7,21 +7,21 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class AvtaleHendelseMelding(
-    var hendelseType: HendelseType,
-    var tiltakstype: Tiltakstype,
-    var avtaleStatus: AvtaleStatus,
-    var startDato: LocalDate?,
-    var sluttDato: LocalDate?,
-    var bedriftNavn: String?,
-    var bedriftNr: String,
-    var stillingstittel: String?,
-    var stillingprosent: Int?,
-    var avtaleInngått: LocalDateTime?,
-    var utførtAv: String,
-    var utførtAvRolle: AvtaleHendelseUtførtAvRolle,
-    var deltakerFnr: String,
-    var avtaleId: UUID,
-    var avtaleNr: Int,
-    var sistEndret: Instant,
-    var veilederNavIdent: String?
+    val hendelseType: HendelseType,
+    val tiltakstype: Tiltakstype,
+    val avtaleStatus: AvtaleStatus,
+    val startDato: LocalDate?,
+    val sluttDato: LocalDate?,
+    val bedriftNavn: String?,
+    val bedriftNr: String,
+    val stillingstittel: String?,
+    val stillingprosent: Int?,
+    val avtaleInngått: LocalDateTime?,
+    val utførtAv: String,
+    val utførtAvRolle: AvtaleHendelseUtførtAvRolle,
+    val deltakerFnr: String,
+    val avtaleId: UUID,
+    val avtaleNr: Int,
+    val sistEndret: Instant,
+    val veilederNavIdent: String?
 )

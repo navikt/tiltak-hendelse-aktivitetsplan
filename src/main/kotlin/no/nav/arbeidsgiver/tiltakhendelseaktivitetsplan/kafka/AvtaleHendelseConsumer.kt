@@ -12,6 +12,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 import kotlinx.coroutines.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
+import java.time.LocalDate
 import java.util.UUID
 
 class AvtaleHendelseConsumer(
@@ -39,6 +40,14 @@ class AvtaleHendelseConsumer(
                 }
                 if (!melding.tiltakstype.skalTilAktivitetsplan) {
                     log.info("melding med tiltakstype ${melding.tiltakstype} skal ikke til aktivitetsplan")
+                    consumer.commitAsync()
+                    return@forEach
+                }
+
+                // Hvis statusendring, filtrer evt vekk ikke aktive avtaler!
+                // TODO: Midlertidig kode. Dett gjelder kun når vi leser inn alle avtalehendelse meldinger.
+                if(melding.avtaleStatus === AvtaleStatus.AVSLUTTET) {
+                    log.info("MIDLERTIDIG - Avtalen er avsluttet, skal ikke til aktivitetsplan")
                     consumer.commitAsync()
                     return@forEach
                 }
