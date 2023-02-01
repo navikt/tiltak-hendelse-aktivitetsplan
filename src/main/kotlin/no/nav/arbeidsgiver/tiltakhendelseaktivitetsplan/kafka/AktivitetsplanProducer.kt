@@ -51,18 +51,16 @@ class AktivitetsplanProducer(
         }
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaMeldingId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
-        if(Cluster.current != Cluster.PROD_GCP) {
-            producer.send(record) { recordMetadata, exception ->
-                when (exception) {
-                    null -> {
-                        log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
-                        // Oppdatere sendt til true
-                        database.settEntitetTilSendt(entitet.id, recordMetadata.offset())
-                    }
-                    else -> {
-                        log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-                        database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
-                    }
+        producer.send(record) { recordMetadata, exception ->
+            when (exception) {
+                null -> {
+                    log.info("Sendt melding til aktivitetsplan (topic=${recordMetadata.topic()}, partition=${recordMetadata.partition()}, offset= ${recordMetadata.offset()})")
+                    // Oppdatere sendt til true
+                    database.settEntitetTilSendt(entitet.id, recordMetadata.offset())
+                }
+                else -> {
+                    log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
+                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
                 }
             }
         }
