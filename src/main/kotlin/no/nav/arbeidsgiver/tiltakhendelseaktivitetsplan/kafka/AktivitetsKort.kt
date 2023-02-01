@@ -97,6 +97,7 @@ data class AktivitetsKort(
                 AvtaleHendelseUtførtAvRolle.BESLUTTER -> IdentType.NAVIDENT
                 AvtaleHendelseUtførtAvRolle.ARBEIDSGIVER -> IdentType.ARBEIDSGIVER
                 AvtaleHendelseUtførtAvRolle.SYSTEM -> IdentType.SYSTEM
+                AvtaleHendelseUtførtAvRolle.DELTAKER -> IdentType.PERSONBRUKER
             }
 
             return Ident(utførtAv, identType)
