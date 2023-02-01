@@ -9,7 +9,6 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -31,10 +30,10 @@ class AktivitetsplanProducer(
     fun sendMelding(entitet: AktivitetsplanMeldingEntitet) {
         log.info("Sender melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
         val melding: AvtaleHendelseMelding = mapper.readValue(entitet.mottattJson)
-        val kafkaMeldingId = melding.avtaleId;
+        val kafkaKey = melding.avtaleId;
         val aktivitetsKort = AktivitetsKort.fromHendelseMelding(melding)
         val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(
-            kafkaMeldingId,
+            UUID.randomUUID(),
             "TEAM_TILTAK",
             "UPSERT_AKTIVITETSKORT_V1",
             melding.tiltakstype, // må sjekke
@@ -49,7 +48,7 @@ class AktivitetsplanProducer(
             log.error("")
             return
         }
-        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaMeldingId.toString(), meldingJson)
+        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaKey.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
         producer.send(record) { recordMetadata, exception ->
             when (exception) {
