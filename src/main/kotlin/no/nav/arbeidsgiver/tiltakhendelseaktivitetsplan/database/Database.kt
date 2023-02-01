@@ -54,7 +54,7 @@ class Database(val dataSource: HikariDataSource) {
     }
 
     fun hentEntiteterSomIkkeErSendt(): List<AktivitetsplanMeldingEntitet> {
-        val query: String = "select * from aktivitetsplan_melding where sendt = false"
+        val query: String = "select * from aktivitetsplan_melding where sendt = false and sending_json is not null"
         return using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query).map(tilAktivitetsplanMeldingEntitet).asList)
         }
