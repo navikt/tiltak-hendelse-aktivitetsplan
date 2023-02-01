@@ -29,8 +29,9 @@ val tilAktivitetsplanMeldingEntitet: (Row) -> AktivitetsplanMeldingEntitet = { r
         mottattJson = row.string("mottatt_json"),
         sendingJson = row.string("sending_json"),
         sendt = row.boolean("sendt"),
-        topicOffset = row.long("topic_offset"),
-        producerTopicOffset = row.long("producer_topic_offset")
+        topicOffset = row.longOrNull("topic_offset"),
+        producerTopicOffset = row.longOrNull("producer_topic_offset")
     )
+
 }
 
