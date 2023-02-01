@@ -96,6 +96,7 @@ data class AktivitetsKort(
                 AvtaleHendelseUtførtAvRolle.VEILEDER -> IdentType.NAVIDENT
                 AvtaleHendelseUtførtAvRolle.BESLUTTER -> IdentType.NAVIDENT
                 AvtaleHendelseUtførtAvRolle.ARBEIDSGIVER -> IdentType.ARBEIDSGIVER
+                AvtaleHendelseUtførtAvRolle.MENTOR -> IdentType.ARBEIDSGIVER
                 AvtaleHendelseUtførtAvRolle.SYSTEM -> IdentType.SYSTEM
                 AvtaleHendelseUtførtAvRolle.DELTAKER -> IdentType.PERSONBRUKER
             }
