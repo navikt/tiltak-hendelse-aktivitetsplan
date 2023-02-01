@@ -34,13 +34,8 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
 
     fun start() {
         logger.info("Starter applikasjon :)")
-
-        if(Cluster.current != Cluster.PROD_GCP) {
-            server.start()
-            avtaleHendelseConsumer.start()
-        } else {
-            server.start(wait = true)
-        }
+        server.start()
+        avtaleHendelseConsumer.start()
     }
 
     override fun close() {
