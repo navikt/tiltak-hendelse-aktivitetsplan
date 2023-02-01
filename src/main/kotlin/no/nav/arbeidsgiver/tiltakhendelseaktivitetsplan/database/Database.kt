@@ -53,6 +53,13 @@ class Database(val dataSource: HikariDataSource) {
         }
     }
 
+    fun hentEntiteterSomIkkeErSendt(): List<AktivitetsplanMeldingEntitet> {
+        val query: String = "select * from aktivitetsplan_melding where sendt = false"
+        return using(sessionOf(dataSource)) { session ->
+            session.run(queryOf(query).map(tilAktivitetsplanMeldingEntitet).asList)
+        }
+    }
+
     fun settEntitetTilSendt(id: UUID, offset: Long) {
         val query: String = """
             update aktivitetsplan_melding set sendt = true, producer_topic_offset = ?, feilmelding = null where id = ?

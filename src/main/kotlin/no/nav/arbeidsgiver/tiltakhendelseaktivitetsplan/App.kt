@@ -10,10 +10,7 @@ import mu.KotlinLogging
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProducer
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseConsumer
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.consumerConfig
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.producerConfig
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
@@ -22,13 +19,14 @@ import org.apache.kafka.clients.producer.Producer
 import java.io.Closeable
 import java.io.File
 
-class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeable {
+class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private val aktivitetsplanService: AktivitetsplanService) : Closeable {
     private val logger = KotlinLogging.logger {}
     private val server = embeddedServer(Netty, port = 8092) {
 
         routing {
             get("/tiltak-hendelse-aktivitetsplan/internal/isAlive") { call.respond(HttpStatusCode.OK) }
             get("/tiltak-hendelse-aktivitetsplan/internal/isReady") { call.respond(HttpStatusCode.OK) }
+            post("/tiltak-hendelse-aktivitetsplan/internal/rekjor-feilede") {aktivitetsplanService.rekjørFeilede()}
         }
     }
 
@@ -51,6 +49,7 @@ fun main() {
     val database = Database(dataSource)
     val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema)
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
+    val aktivitetsplanService = AktivitetsplanService(database, aktivitetsplanProducer)
 
-    App(avtaleHendelseConsumer).start()
+    App(avtaleHendelseConsumer, aktivitetsplanService).start()
 }
