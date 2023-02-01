@@ -15,7 +15,7 @@ data class AktivitetsplanMeldingEntitet(
     val mottattJson: String,
     val sendingJson: String?,
     val sendt: Boolean,
-    val topicOffset: Long,
+    val topicOffset: Long?,
     val producerTopicOffset: Long?
 )
 
