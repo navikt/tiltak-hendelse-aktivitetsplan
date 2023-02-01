@@ -31,7 +31,7 @@ class AktivitetsplanProducer(
     fun sendMelding(entitet: AktivitetsplanMeldingEntitet) {
         log.info("Sender melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
         val melding: AvtaleHendelseMelding = mapper.readValue(entitet.mottattJson)
-        val kafkaMeldingId = UUID.randomUUID()
+        val kafkaMeldingId = melding.avtaleId;
         val aktivitetsKort = AktivitetsKort.fromHendelseMelding(melding)
         val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(
             kafkaMeldingId,
