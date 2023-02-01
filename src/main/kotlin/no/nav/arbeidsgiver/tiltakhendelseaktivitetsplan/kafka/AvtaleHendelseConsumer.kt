@@ -46,11 +46,11 @@ class AvtaleHendelseConsumer(
 
                 // Hvis statusendring, filtrer evt vekk ikke aktive avtaler!
                 // TODO: Midlertidig kode. Dett gjelder kun når vi leser inn alle avtalehendelse meldinger.
-                if(melding.avtaleStatus === AvtaleStatus.AVSLUTTET) {
-                    log.info("MIDLERTIDIG - Avtalen er avsluttet, skal ikke til aktivitetsplan")
-                    consumer.commitAsync()
-                    return@forEach
-                }
+//                if(melding.avtaleStatus === AvtaleStatus.AVSLUTTET) {
+//                    log.info("MIDLERTIDIG - Avtalen er avsluttet, skal ikke til aktivitetsplan")
+//                    consumer.commitAsync()
+//                    return@forEach
+//                }
 
                 val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
                     id = UUID.randomUUID(),
