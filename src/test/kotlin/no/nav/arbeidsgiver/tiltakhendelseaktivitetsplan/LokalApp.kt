@@ -20,8 +20,9 @@ fun main() {
     val database = Database(testDataSource)
     val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema)
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
+    val aktivitetsplanService = AktivitetsplanService(database, aktivitetsplanProducer)
 
-    val app = App(avtaleHendelseConsumer)
+    val app = App(avtaleHendelseConsumer, aktivitetsplanService)
     Server.createWebServer().start()
     app.start()
 }
