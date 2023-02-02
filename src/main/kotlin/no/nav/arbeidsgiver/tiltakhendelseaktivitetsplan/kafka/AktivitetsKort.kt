@@ -20,7 +20,7 @@ data class AktivitetsKort(
     val endretTidspunkt: Instant,
     val avtaltMedNav: Boolean,
     val oppgave: Oppgave?,
-    val handlinger: List<LenkeSeksjon>,
+    val handlinger: List<LenkeSeksjon>?,
     val detaljer: List<Attributt>
     //val avsluttetBegrunnelse: String?,
 
@@ -29,6 +29,29 @@ data class AktivitetsKort(
 ) {
     companion object {
         fun fromHendelseMelding(melding: AvtaleHendelseMelding): AktivitetsKort {
+
+            if(melding.annullertGrunn.equals("Feilregistrert")) {
+                return AktivitetsKort(
+                    id = melding.avtaleId,
+                    personIdent = melding.deltakerFnr,
+                    startDato = melding.startDato,
+                    sluttDato = melding.sluttDato,
+                    tittel = "Annullert avtale",
+                    //  beskrivelse = "Dette er en beskrivelse",
+                    aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
+                    endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
+                    endretTidspunkt = melding.sistEndret,
+                    avtaltMedNav = melding.veilederNavIdent != null,
+                    oppgave = null,
+                    handlinger = null,
+                    detaljer = listOf(
+                        lagAttributt(label = "Arbeidsgiver", verdi = "--"),
+                        lagAttributt(label = "Stilling", verdi = "--"),
+                        lagAttributt(label = "Stillingsprosent", verdi = "--")
+                    )
+                )
+            }
+
             return AktivitetsKort(
                 id = melding.avtaleId,
                 personIdent = melding.deltakerFnr,
@@ -50,7 +73,6 @@ data class AktivitetsKort(
                     lagAttributt(label = "Stilling", verdi = melding.stillingstittel),
                     lagAttributt(label = "Stillingsprosent", verdi = melding.stillingprosent?.toString())
                 )
-                //avsluttetBegrunnelse = null
             )
         }
 
