@@ -30,12 +30,12 @@ data class AktivitetsKort(
     companion object {
         fun fromHendelseMelding(melding: AvtaleHendelseMelding): AktivitetsKort {
 
-            if(melding.annullertGrunn.equals("Feilregistrert")) {
+            if(melding.annullertGrunn.equals("Feilregistrering")) {
                 return AktivitetsKort(
                     id = melding.avtaleId,
                     personIdent = melding.deltakerFnr,
-                    startDato = melding.startDato,
-                    sluttDato = melding.sluttDato,
+                    startDato = null,
+                    sluttDato = null,
                     tittel = "Annullert avtale",
                     //  beskrivelse = "Dette er en beskrivelse",
                     aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
