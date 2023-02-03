@@ -8,6 +8,7 @@ data class AktivitetsplanMeldingKassering(
     val aktivitetsId: UUID,
     val personIdent: String,
     val navIdent: String,
+    val messageId: String
 ) {
     companion object {
         fun fromHendelseMelding(melding: AvtaleHendelseMelding): AktivitetsplanMeldingKassering {
@@ -16,7 +17,8 @@ data class AktivitetsplanMeldingKassering(
                 actionType = "KASSER_AKTIVITET",
                 aktivitetsId = melding.avtaleId,
                 personIdent = melding.deltakerFnr,
-                navIdent = melding.veilederNavIdent.toString()
+                navIdent = melding.veilederNavIdent.toString(),
+                messageId = UUID.randomUUID().toString()
             )
         }
     }

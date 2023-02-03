@@ -50,8 +50,6 @@ class AktivitetsplanProducer(
             return
         }
 
-
-
         val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaKey.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
         producer.send(record) { recordMetadata, exception ->
