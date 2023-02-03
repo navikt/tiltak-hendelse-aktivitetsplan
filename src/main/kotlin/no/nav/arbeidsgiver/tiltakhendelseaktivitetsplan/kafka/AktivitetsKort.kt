@@ -14,7 +14,6 @@ data class AktivitetsKort(
     val startDato: LocalDate?,
     val sluttDato: LocalDate?,
     val tittel: String,
-    // val beskrivelse: String,
     val aktivitetStatus: AktivitetStatus,
     val endretAv: Ident,
     val endretTidspunkt: Instant,
@@ -22,36 +21,12 @@ data class AktivitetsKort(
     val oppgave: Oppgave?,
     val handlinger: List<LenkeSeksjon>?,
     val detaljer: List<Attributt>
-    //val avsluttetBegrunnelse: String?,
 
     // Attributter, lenker og lignende
 
 ) {
     companion object {
         fun fromHendelseMelding(melding: AvtaleHendelseMelding): AktivitetsKort {
-
-            if(melding.annullertGrunn.equals("Feilregistrering")) {
-                return AktivitetsKort(
-                    id = melding.avtaleId,
-                    personIdent = melding.deltakerFnr,
-                    startDato = null,
-                    sluttDato = null,
-                    tittel = "Annullert avtale",
-                    //  beskrivelse = "Dette er en beskrivelse",
-                    aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
-                    endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
-                    endretTidspunkt = melding.sistEndret,
-                    avtaltMedNav = melding.veilederNavIdent != null,
-                    oppgave = null,
-                    handlinger = null,
-                    detaljer = listOf(
-                        lagAttributt(label = "Arbeidsgiver", verdi = "--"),
-                        lagAttributt(label = "Stilling", verdi = "--"),
-                        lagAttributt(label = "Stillingsprosent", verdi = "--")
-                    )
-                )
-            }
-
             return AktivitetsKort(
                 id = melding.avtaleId,
                 personIdent = melding.deltakerFnr,

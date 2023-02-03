@@ -7,16 +7,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import net.pwall.json.schema.JSONSchema
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.*
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Attributt
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeSeksjon
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeType
 import org.junit.jupiter.api.Test
 import java.net.URL
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
 
-class MappingTest {
+class MappingKasseringTest {
 
-    val meldingJson = "{\n" +
+    val kasseringMeldingJson = "{\n" +
             "        \"hendelseType\": \"STILLINGSBESKRIVELSE_ENDRET\",\n" +
             "        \"avtaleStatus\": \"GJENNOMFØRES\",\n" +
             "        \"deltakerFnr\": \"00000000000\",\n" +
@@ -29,7 +31,7 @@ class MappingTest {
             "        \"avtaleNr\": 12,\n" +
             "        \"sistEndret\": \"2022-11-02T08:36:56.866170256Z\",\n" +
             "        \"annullertTidspunkt\": null,\n" +
-            "        \"annullertGrunn\": null,\n" +
+            "        \"annullertGrunn\": \"Feilregistrering\",\n" +
             "        \"slettemerket\": false,\n" +
             "        \"opprettetAvArbeidsgiver\": false,\n" +
             "        \"enhetGeografisk\": null,\n" +
@@ -119,42 +121,28 @@ class MappingTest {
     fun json_melding_skall_kunne_deserialiseres() {
         val mapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         mapper.registerModule(JavaTimeModule())
-        val melding: AvtaleHendelseMelding = mapper.readValue(meldingJson)
+        val kasseringMelding: AvtaleHendelseMelding = mapper.readValue(kasseringMeldingJson)
     }
 
     @Test
     fun melding_til_aktivitetsplan_skal_serialiseres() {
-        val aktivitetsKort = AktivitetsKort(
-            id = UUID.randomUUID(),
-            personIdent = "12345678901",
-            startDato = LocalDate.now(),
-            sluttDato = LocalDate.now(),
-            tittel = "En tittel",
-           // "En beskrivelse",
-            aktivitetStatus = AktivitetStatus.FULLFORT,
-            endretAv = Ident("Z123456", IdentType.NAVIDENT),
-            endretTidspunkt = Instant.now(),
-            avtaltMedNav = true,
-            oppgave = null, //Oppgave(ekstern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = ""), intern = OppgaveLenke("", "", URL("https://nav.no"), knapptekst = "")),
-            handlinger = listOf(LenkeSeksjon("Gå til avtale", "", URL("https://lalalala.no"), LenkeType.INTERN)),
-            detaljer = listOf(Attributt("", ""))
-            //"Hepp"
-        )
+        val mapperFromJson = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        mapperFromJson.registerModule(JavaTimeModule())
+        val kasseringMelding: AvtaleHendelseMelding = mapperFromJson.readValue(kasseringMeldingJson)
+        val aktivitetsplanMeldingKassering = AktivitetsplanMeldingKassering.fromHendelseMelding(melding = kasseringMelding)
 
-        val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "TEAM_TILTAK", "UPSERT_AKTIVITETSKORT_V1", Tiltakstype.MIDLERTIDIG_LONNSTILSKUDD, aktivitetsKort)
-
-        val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
+        val schemaKassering = JSONSchema.parseFile("src/test/resources/schema-kassering.yml")
 
         val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(JavaTimeModule())
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        val json = mapper.writeValueAsString(aktivitetsplanMelding)
-        val output = schema.validateBasic(json)
+        val json = mapper.writeValueAsString(aktivitetsplanMeldingKassering)
+        val output = schemaKassering.validateBasic(json)
         output.errors?.forEach {
             println("${it.error} - ${it.instanceLocation}")
         }
-        require(schema.validate(json))
+        require(schemaKassering.validate(json))
         println(json)
     }
 }

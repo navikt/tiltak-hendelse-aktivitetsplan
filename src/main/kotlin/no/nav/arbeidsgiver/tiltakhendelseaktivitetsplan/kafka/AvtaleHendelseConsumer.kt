@@ -44,14 +44,6 @@ class AvtaleHendelseConsumer(
                     return@forEach
                 }
 
-                // Hvis statusendring, filtrer evt vekk ikke aktive avtaler!
-                // TODO: Midlertidig kode. Dett gjelder kun når vi leser inn alle avtalehendelse meldinger.
-//                if(melding.avtaleStatus === AvtaleStatus.AVSLUTTET) {
-//                    log.info("MIDLERTIDIG - Avtalen er avsluttet, skal ikke til aktivitetsplan")
-//                    consumer.commitAsync()
-//                    return@forEach
-//                }
-
                 val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
                     id = UUID.randomUUID(),
                     avtaleId = melding.avtaleId,
@@ -67,8 +59,13 @@ class AvtaleHendelseConsumer(
                 database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
                 consumer.commitAsync()
                 // kjør en asynkron co-routine
-                val job = kallProducer(aktivitetsplanMeldingEntitet)
-                log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
+                if(melding.annullertGrunn.equals("Feilregistrering")) {
+                    val job = kallProducerForKassering(aktivitetsplanMeldingEntitet)
+                    log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
+                } else {
+                    val job = kallProducer(aktivitetsplanMeldingEntitet)
+                    log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
+                }
             }
         }
     }
@@ -77,6 +74,13 @@ class AvtaleHendelseConsumer(
         launch {
             log.info("Launcher produsent for å sende melding til aktivitsplan")
             aktivitetsplanProducer.sendMelding(melding)
+        }
+    }
+
+    suspend fun kallProducerForKassering(melding: AktivitetsplanMeldingEntitet) = coroutineScope {
+        launch {
+            log.info("Launcher produsent for å sende kasseringsmelding til aktivitsplan")
+            aktivitetsplanProducer.sendKasserMelding(melding)
         }
     }
 }
