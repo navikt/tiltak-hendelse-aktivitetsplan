@@ -7,6 +7,7 @@ import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import mu.KotlinLogging
+import net.pwall.json.JSONComposite
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
@@ -45,11 +46,12 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
 }
 fun main() {
     val schema = JSONSchema.parseFile("schema.yml")
+    val kasseringSchema = JSONSchema.parseFile("schema-kassering.yml")
     // Setup kafka and database
     val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
     val producer: Producer<String, String> = KafkaProducer(producerConfig())
     val database = Database(dataSource)
-    val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema)
+    val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema, kasseringSchema)
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
 
     App(avtaleHendelseConsumer).start()

@@ -23,5 +23,6 @@ data class AvtaleHendelseMelding(
     val avtaleId: UUID,
     val avtaleNr: Int,
     val sistEndret: Instant,
-    val veilederNavIdent: String?
+    val veilederNavIdent: String?,
+    val annullertGrunn: String?
 )

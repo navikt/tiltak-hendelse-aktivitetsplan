@@ -14,15 +14,13 @@ data class AktivitetsKort(
     val startDato: LocalDate?,
     val sluttDato: LocalDate?,
     val tittel: String,
-    // val beskrivelse: String,
     val aktivitetStatus: AktivitetStatus,
     val endretAv: Ident,
     val endretTidspunkt: Instant,
     val avtaltMedNav: Boolean,
     val oppgave: Oppgave?,
-    val handlinger: List<LenkeSeksjon>,
+    val handlinger: List<LenkeSeksjon>?,
     val detaljer: List<Attributt>
-    //val avsluttetBegrunnelse: String?,
 
     // Attributter, lenker og lignende
 
@@ -50,7 +48,6 @@ data class AktivitetsKort(
                     lagAttributt(label = "Stilling", verdi = melding.stillingstittel),
                     lagAttributt(label = "Stillingsprosent", verdi = melding.stillingprosent?.toString())
                 )
-                //avsluttetBegrunnelse = null
             )
         }
 
