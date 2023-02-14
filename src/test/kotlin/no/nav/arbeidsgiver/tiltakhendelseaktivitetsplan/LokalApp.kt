@@ -1,6 +1,5 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan
 
-import net.pwall.json.JSON
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.testDataSource
@@ -10,7 +9,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import org.h2.tools.Server
-import java.io.File
 
 fun main() {
     val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
@@ -21,8 +19,9 @@ fun main() {
     val database = Database(testDataSource)
     val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema, kasseringSchema)
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
+    val aktivitetsplanFeilConsumer = FeilConsumer(consumer, database)
 
-    val app = App(avtaleHendelseConsumer)
+    val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer)
     Server.createWebServer().start()
     app.start()
 }

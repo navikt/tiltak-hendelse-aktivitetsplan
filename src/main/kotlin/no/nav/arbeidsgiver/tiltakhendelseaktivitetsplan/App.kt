@@ -7,23 +7,17 @@ import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import mu.KotlinLogging
-import net.pwall.json.JSONComposite
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProducer
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseConsumer
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.consumerConfig
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.producerConfig
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.*
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import java.io.Closeable
-import java.io.File
 
-class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeable {
+class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private val aktivitetsplanFeilConsumer: FeilConsumer) : Closeable {
     private val logger = KotlinLogging.logger {}
     private val server = embeddedServer(Netty, port = 8092) {
 
@@ -37,6 +31,7 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer) : Closeabl
         logger.info("Starter applikasjon :)")
         server.start()
         avtaleHendelseConsumer.start()
+        aktivitetsplanFeilConsumer.start()
     }
 
     override fun close() {
@@ -49,10 +44,12 @@ fun main() {
     val kasseringSchema = JSONSchema.parseFile("schema-kassering.yml")
     // Setup kafka and database
     val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
+    val feilConsumer: Consumer<String, String> = KafkaConsumer(feilConsumerConfig())
     val producer: Producer<String, String> = KafkaProducer(producerConfig())
     val database = Database(dataSource)
     val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema, kasseringSchema)
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
+    val aktivitetsplanFeilConsumer = FeilConsumer(feilConsumer, database)
 
-    App(avtaleHendelseConsumer).start()
+    App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer).start()
 }
