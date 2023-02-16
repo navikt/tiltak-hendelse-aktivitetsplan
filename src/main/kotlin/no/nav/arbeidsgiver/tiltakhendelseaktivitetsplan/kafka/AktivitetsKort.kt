@@ -46,7 +46,8 @@ data class AktivitetsKort(
                 detaljer = listOf(
                     lagAttributt(label = "Arbeidsgiver", verdi = melding.bedriftNavn),
                     lagAttributt(label = "Stilling", verdi = melding.stillingstittel),
-                    lagAttributt(label = "Stillingsprosent", verdi = melding.stillingprosent?.toString())
+                    lagAttributt(label = "Stillingsprosent", verdi = melding.stillingprosent?.toString()),
+                    lagAttributt(label = "Antall dager per uke", verdi = melding.antallDagerPerUke?.toString())
                 )
             )
         }
