@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: tiltak-hendelse-aktivitetsplan
-  namespace: arbeidsgiver
+  namespace: team-tiltak
   labels:
     team: team-tiltak
 spec:
