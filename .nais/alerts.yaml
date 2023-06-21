@@ -1,41 +1,41 @@
-#apiVersion: monitoring.coreos.com/v1
-#kind: PrometheusRule
-#metadata:
-#  name: tiltak-hendelse-aktivitetsplan
-#  namespace: team-tiltak
-#  labels:
-#    team: team-tiltak
-#spec:
-#  groups:
-#    - name: ttiltak-hendelse-aktivitetsplan-alerts
-#      rules:
-#        - alert: applikasjon nede
-#          expr: sum(up{app="tiltak-hendelse-aktivitetsplan", job="nais-system/monitoring-apps-tenant"}) == 0
-#          for: 1s
-#          annotations:
-#            summary: tiltak-hendelse-aktivitetsplan er nede
-#            action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for logger"
-#          labels:
-#            namespace: team-tiltak
-#            severity: critical
-#
-#        - alert: Antall restarts
-#          expr: sum(increase(kube_pod_container_status_restarts_total{container=~"tiltak-hendelse-aktivitetsplan"}[30m])) by (container) > 2
-#          for: 5m
-#          annotations:
-#            summary: tiltak-hendelse-aktivitetsplan har restartet flere ganger siste halvtimen!
-#            action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for logger"
-#          labels:
-#            namespace: team-tiltak
-#            severity: critical
-#
-#        - alert: tiltak-hendelse-aktivitetsplan ERROR!
-#          expr: sum(increase(logd_messages_total{log_app="tiltak-okonomi",log_level="Error"}[10m])) > 0
-#          for: 10s
-#          annotations:
-#            summary: |-
-#              tiltak-hendelse-aktivitetsplan har logget en feil :blobsweat: Sjekk loggene om noe bør gjøres!
-#            action: "Sjekk logs.adeo.no for logger: https://logs.adeo.no/s/nav-logs-legacy/app/r/s/O2UYK"
-#          labels:
-#            namespace: team-tiltak
-#            severity: critical
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: tiltak-hendelse-aktivitetsplan
+  namespace: team-tiltak
+  labels:
+    team: team-tiltak
+spec:
+  groups:
+    - name: ttiltak-hendelse-aktivitetsplan-alerts
+      rules:
+        - alert: applikasjon nede
+          expr: sum(up{app="tiltak-hendelse-aktivitetsplan", job="nais-system/monitoring-apps-tenant"}) == 0
+          for: 1s
+          annotations:
+            summary: tiltak-hendelse-aktivitetsplan er nede
+            action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for logger"
+          labels:
+            namespace: team-tiltak
+            severity: critical
+
+        - alert: Antall restarts
+          expr: sum(increase(kube_pod_container_status_restarts_total{container=~"tiltak-hendelse-aktivitetsplan"}[30m])) by (container) > 2
+          for: 5m
+          annotations:
+            summary: tiltak-hendelse-aktivitetsplan har restartet flere ganger siste halvtimen!
+            action: "`kubectl describe pod {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for events, og `kubectl logs {{ $labels.kubernetes_pod_name }} -n {{ $labels.kubernetes_namespace }}` for logger"
+          labels:
+            namespace: team-tiltak
+            severity: critical
+
+        - alert: tiltak-hendelse-aktivitetsplan ERROR!
+          expr: sum(increase(logback_events_total{app="tiltak-hendelse-aktivitetsplan",level="error"}[10m])) > 0
+          for: 10s
+          annotations:
+            summary: |-
+              tiltak-hendelse-aktivitetsplan har logget en feil :blobsweat: Sjekk loggene om noe bør gjøres!
+            action: "Sjekk logs.adeo.no for logger: https://logs.adeo.no/s/nav-logs-legacy/app/r/s/O2UYK"
+          labels:
+            namespace: team-tiltak
+            severity: critical
