@@ -19,7 +19,7 @@ import java.io.Closeable
 
 class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private val aktivitetsplanFeilConsumer: FeilConsumer) : Closeable {
     private val logger = KotlinLogging.logger {}
-    private val server = embeddedServer(Netty, port = 8092) {
+    private val server = embeddedServer(Netty, port = 8080) {
 
         routing {
             get("/tiltak-hendelse-aktivitetsplan/internal/isAlive") { call.respond(HttpStatusCode.OK) }
