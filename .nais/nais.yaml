@@ -11,12 +11,10 @@ spec:
   image: {{image}}
   liveness:
     path: "/tiltak-hendelse-aktivitetsplan/internal/isAlive"
-    port: 8092
     initialDelay: 20
     timeout: 60
   readiness:
     path: "/tiltak-hendelse-aktivitetsplan/internal/isReady"
-    port: 8092
     initialDelay: 20
     timeout: 60
   replicas:
