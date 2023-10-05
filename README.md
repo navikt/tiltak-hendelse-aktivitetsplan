@@ -3,6 +3,6 @@ Applikasjon for konsumering av avtalehendelser som oppstår i tiltaksgjennomfori
 
 
 
-Eeies av team tiltk i PO Arbeidsgiver.
+Eies av team tiltak i PO Arbeidsoppfølging.
 <br/>
 Kontakt slack: #arbeidsgiver-tiltak
