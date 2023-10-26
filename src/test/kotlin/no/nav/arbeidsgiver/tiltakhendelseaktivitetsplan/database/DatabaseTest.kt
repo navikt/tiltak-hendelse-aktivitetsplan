@@ -37,6 +37,15 @@ class DatabaseTest {
         producerTopicOffset = 54321L
     )
 
+    val feiletEntitet = HendelseMeldingFeiletEntitet(
+        id = UUID.fromString("66276156-9bc6-11ed-a8fc-0242ac120002"),
+        avtaleId = "66276156-9bc6-11ed-a8fc-0242ac120002",
+        mottattTidspunkt = LocalDateTime.now(),
+        mottattJson = "",
+        topicOffset = 123456L,
+        feilmelding = "Oh noes"
+    )
+
     @Test
     fun skal_kunne_lagre_og_hente_entiteter() {
         val database = Database(testDataSource)
@@ -56,6 +65,12 @@ class DatabaseTest {
             assertTrue(aktivitetsplanMeldingEntitet.sendt)
             assertEquals(1337L, aktivitetsplanMeldingEntitet.producerTopicOffset)
         }
+    }
+
+    @Test
+    fun skal_kunne_lagre_feilede_hendelse_i_database() {
+        val database = Database(testDataSource)
+        database.lagreNyHendelseMeldingFeiletEntitet(feiletEntitet)
     }
 
 }

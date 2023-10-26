@@ -12,6 +12,8 @@ import java.time.Duration
 import java.time.LocalDateTime
 import kotlinx.coroutines.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.HendelseMeldingFeiletEntitet
+import java.lang.Exception
 import java.time.LocalDate
 import java.util.UUID
 
@@ -30,7 +32,24 @@ class AvtaleHendelseConsumer(
             val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(5))
             records.isEmpty && continue
             records.forEach {
-                val melding: AvtaleHendelseMelding = mapper.readValue(it.value())
+                val melding: AvtaleHendelseMelding = try {
+                     mapper.readValue(it.value())
+                } catch (e: Exception) {
+                    // lagre i database med feilstatus
+                    log.error("Meldingen med avtaleId (record key) ${it.key()} kunne ikke parses")
+                    val hendelseMeldingFeiletEntitet = HendelseMeldingFeiletEntitet(
+                        id = UUID.randomUUID(),
+                        avtaleId = it.key(),
+                        mottattJson = it.value(),
+                        topicOffset = it.offset(),
+                        mottattTidspunkt = LocalDateTime.now(),
+                        feilmelding = e.toString()
+                    )
+                    database.lagreNyHendelseMeldingFeiletEntitet(hendelseMeldingFeiletEntitet)
+                    consumer.commitAsync()
+                    return@forEach
+                }
+
                 log.info("Lest melding med avtale-id ${melding.avtaleId}")
                 // Filtrere vekk de som ikke skal til aktivitetplan
                 if (!melding.hendelseType.skalTilAktivitetsplan) {
@@ -59,7 +78,7 @@ class AvtaleHendelseConsumer(
                 database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
                 consumer.commitAsync()
                 // kjør en asynkron co-routine
-                if(melding.annullertGrunn.equals("Feilregistrering")) {
+                if (melding.annullertGrunn.equals("Feilregistrering")) {
                     val job = kallProducerForKassering(aktivitetsplanMeldingEntitet)
                     log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
                 } else {
