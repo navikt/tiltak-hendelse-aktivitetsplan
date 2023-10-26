@@ -53,6 +53,13 @@ class Database(val dataSource: HikariDataSource) {
         }
     }
 
+    fun hentEntitetMedAvtaleId(avtaleId: UUID): AktivitetsplanMeldingEntitet? {
+        val query = "select * from aktivitetsplan_melding where avtale_id = ?"
+        return using(sessionOf(dataSource)) { session ->
+            session.run(queryOf(query, avtaleId).map(tilAktivitetsplanMeldingEntitet).asSingle)
+        }
+    }
+
     fun settEntitetTilSendt(id: UUID, offset: Long) {
         val query: String = """
             update aktivitetsplan_melding set sendt = true, producer_topic_offset = ?, feilmelding = null where id = ?
