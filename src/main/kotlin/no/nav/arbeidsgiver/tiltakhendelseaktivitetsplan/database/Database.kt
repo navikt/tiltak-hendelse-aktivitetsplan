@@ -80,4 +80,25 @@ class Database(val dataSource: HikariDataSource) {
         }
     }
 
+    fun lagreNyHendelseMeldingFeiletEntitet(hendelseMeldingFeiletEntitet: HendelseMeldingFeiletEntitet) {
+        val query: String = """
+            insert into hendelse_melding_feilet (id, avtale_id, mottatt_tidspunkt, mottatt_json, topic_offset, feilmelding) values
+            (?, ?, ?, ?, ?, ?)
+        """.trimIndent();
+        using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf(
+                    query,
+                    hendelseMeldingFeiletEntitet.id,
+                    hendelseMeldingFeiletEntitet.avtaleId,
+                    hendelseMeldingFeiletEntitet.mottattTidspunkt,
+                    hendelseMeldingFeiletEntitet.mottattJson,
+                    hendelseMeldingFeiletEntitet.topicOffset,
+                    hendelseMeldingFeiletEntitet.feilmelding
+                ).asUpdate
+            )
+        }
+        log.info("Lagret feilet hendelse i database")
+    }
+
 }
