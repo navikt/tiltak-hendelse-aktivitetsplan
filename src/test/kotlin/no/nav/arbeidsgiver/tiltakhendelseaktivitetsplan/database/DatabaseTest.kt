@@ -39,7 +39,7 @@ class DatabaseTest {
 
     val entitet3medSammeAvtaleId = AktivitetsplanMeldingEntitet(
         id = UUID.fromString("71c33696-442d-49a0-ac04-18c77373a1fe"),
-        avtaleId = UUID.fromString("251c5828-59dc-11ed-9b6a-0242ac120002"),
+        avtaleId = UUID.fromString("64e80700-c9b9-4e03-9741-7566eb0542e7"),
         avtaleStatus = AvtaleStatus.GJENNOMFØRES,
         opprettetTidspunkt = LocalDateTime.now(),
         hendelseType = HendelseType.AVTALE_FORLENGET,
@@ -52,7 +52,7 @@ class DatabaseTest {
 
     val entitet4medSammeAvtaleId = AktivitetsplanMeldingEntitet(
         id = UUID.fromString("7433d909-01f6-496c-afc1-56b76c9f3795"),
-        avtaleId = UUID.fromString("251c5828-59dc-11ed-9b6a-0242ac120002"),
+        avtaleId = UUID.fromString("64e80700-c9b9-4e03-9741-7566eb0542e7"),
         avtaleStatus = AvtaleStatus.GJENNOMFØRES,
         opprettetTidspunkt = LocalDateTime.now(),
         hendelseType = HendelseType.AVTALE_FORLENGET,
@@ -80,7 +80,7 @@ class DatabaseTest {
         val aktivitetsplanMeldingEntitetHentetMedAvtaleId = database.hentEntitetMedAvtaleId(UUID.fromString("251c5828-59dc-11ed-9b6a-0242ac120002"))
         assertNotNull(aktivitetsplanMeldingEntitet)
         assertNotNull(aktivitetsplanMeldingEntitetHentetMedAvtaleId)
-        assertEquals(aktivitetsplanMeldingEntitet, aktivitetsplanMeldingEntitetHentetMedAvtaleId)
+        assertEquals(aktivitetsplanMeldingEntitetHentetMedAvtaleId.size, 1)
     }
 
     @Test
@@ -88,6 +88,8 @@ class DatabaseTest {
         val database = Database(testDataSource)
         database.lagreNyAktivitetsplanMeldingEntitet(entitet3medSammeAvtaleId)
         database.lagreNyAktivitetsplanMeldingEntitet(entitet4medSammeAvtaleId)
+        val aktivitetsplanMeldingEntitetHentetMedAvtaleId = database.hentEntitetMedAvtaleId(UUID.fromString("64e80700-c9b9-4e03-9741-7566eb0542e7"))
+        assertEquals(aktivitetsplanMeldingEntitetHentetMedAvtaleId!!.size, 2)
     }
 
     @Test

@@ -53,10 +53,10 @@ class Database(val dataSource: HikariDataSource) {
         }
     }
 
-    fun hentEntitetMedAvtaleId(avtaleId: UUID): AktivitetsplanMeldingEntitet? {
+    fun hentEntitetMedAvtaleId(avtaleId: UUID): List<AktivitetsplanMeldingEntitet>? {
         val query = "select * from aktivitetsplan_melding where avtale_id = ?"
         return using(sessionOf(dataSource)) { session ->
-            session.run(queryOf(query, avtaleId).map(tilAktivitetsplanMeldingEntitet).asSingle)
+            session.run(queryOf(query, avtaleId).map(tilAktivitetsplanMeldingEntitet).asList)
         }
     }
 

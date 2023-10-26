@@ -27,7 +27,7 @@ class FeilConsumer(
                 val avtaleId = it.key(); // Kafka key er funksjonell id som altså skal være avtaleId.
                 val hendelseMelding = database.hentEntitetMedAvtaleId(UUID.fromString(avtaleId));
                 // Log error om det er en melding vi har sendt
-                if(hendelseMelding != null) {
+                if(!hendelseMelding.isNullOrEmpty()) {
                     log.error("Feil fra aktivitetsplan for avtale ${avtaleId}. Feilmelding: ${melding.errorMessage}");
                 }
             }
