@@ -6,6 +6,9 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
@@ -27,11 +30,13 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private va
         }
     }
 
-    fun start() {
+    suspend fun start() {
         logger.info("Starter applikasjon :)")
         server.start()
-        avtaleHendelseConsumer.start()
-        aktivitetsplanFeilConsumer.start()
+        coroutineScope {
+            launch { avtaleHendelseConsumer.start() }
+            launch { aktivitetsplanFeilConsumer.start() }
+        }
     }
 
     override fun close() {
@@ -39,7 +44,7 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private va
         server.stop(0, 0)
     }
 }
-fun main() {
+suspend fun main() {
     val schema = JSONSchema.parseFile("schema.yml")
     val kasseringSchema = JSONSchema.parseFile("schema-kassering.yml")
     // Setup kafka and database
