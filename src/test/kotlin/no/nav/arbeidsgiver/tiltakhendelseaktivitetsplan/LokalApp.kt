@@ -10,7 +10,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import org.h2.tools.Server
 
-fun main() {
+suspend fun main() {
     val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
     val kasseringSchema = JSONSchema.parseFile("src/test/resources/schema-kassering.yml")
     // Testoppsett
