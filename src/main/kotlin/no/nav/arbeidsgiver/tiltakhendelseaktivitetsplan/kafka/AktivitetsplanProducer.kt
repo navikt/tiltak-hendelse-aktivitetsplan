@@ -42,7 +42,7 @@ class AktivitetsplanProducer(
             aktivitetsKort)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
 
-        sjekkSistEndret(aktivitetsKort.endretTidspunkt)
+        sjekkEndretTidspunkt(aktivitetsKort.endretTidspunkt)
 
         if(!schema.validate(meldingJson))  {
             val output = schema.validateBasic(meldingJson)
@@ -104,7 +104,7 @@ class AktivitetsplanProducer(
         }
     }
 
-    private fun sjekkSistEndret(sistEndret: Instant) {
+    private fun sjekkEndretTidspunkt(sistEndret: Instant) {
         if (sistEndret.isBefore(Instant.now().minus(30, java.time.temporal.ChronoUnit.MINUTES))) {
             log.warn("Sist endret ($sistEndret) som vi sender til aktivitetsplanen som endretTidspiunkt er mer enn 30 minutter gammel!")
         }
