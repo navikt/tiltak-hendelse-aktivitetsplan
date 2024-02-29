@@ -12,6 +12,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
+import java.time.Instant
 import java.util.UUID
 
 private const val AKTIVITETSPLAN_TOPIC = "dab.aktivitetskort-v1.1"
@@ -40,6 +41,8 @@ class AktivitetsplanProducer(
             melding.tiltakstype, // må sjekke
             aktivitetsKort)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
+
+        sjekkSistEndret(aktivitetsKort.endretTidspunkt)
 
         if(!schema.validate(meldingJson))  {
             val output = schema.validateBasic(meldingJson)
@@ -98,6 +101,12 @@ class AktivitetsplanProducer(
                     database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
                 }
             }
+        }
+    }
+
+    private fun sjekkSistEndret(sistEndret: Instant) {
+        if (sistEndret.isBefore(Instant.now().minus(30, java.time.temporal.ChronoUnit.MINUTES))) {
+            log.warn("Sist endret ($sistEndret) som vi sender til aktivitetsplanen som endretTidspiunkt er mer enn 30 minutter gammel!")
         }
     }
 }
