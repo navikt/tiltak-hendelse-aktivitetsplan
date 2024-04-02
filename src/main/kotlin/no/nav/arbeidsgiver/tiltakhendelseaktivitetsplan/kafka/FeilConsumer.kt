@@ -32,6 +32,8 @@ class FeilConsumer(
                 // Log error om det er en melding vi har sendt
                 if (!hendelseMelding.isNullOrEmpty()) {
                     log.error("Feil fra aktivitetsplan for avtale ${avtaleId}. Feilmelding: ${melding.errorMessage}");
+                }else{
+                    log.info("Ikke en Team Tiltak feil fra aktivitetsplan med id ${it.key()} som skal ignoreres.")
                 }
             }
             consumer.commitAsync()
