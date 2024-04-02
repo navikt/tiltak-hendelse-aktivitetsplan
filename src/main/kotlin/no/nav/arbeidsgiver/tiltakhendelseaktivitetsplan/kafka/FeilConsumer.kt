@@ -34,6 +34,7 @@ class FeilConsumer(
                     log.error("Feil fra aktivitetsplan for avtale ${avtaleId}. Feilmelding: ${melding.errorMessage}");
                 }
             }
+            consumer.commitAsync()
         }
     }
 }
