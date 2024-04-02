@@ -23,18 +23,20 @@ class FeilConsumer(
             .registerModule(JavaTimeModule())
         consumer.subscribe(listOf(Topics.AKTIVITETSPLAN_FEIL))
         while (true) {
-            val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofMinutes(5))
+            val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(20))
             records.isEmpty && continue
             records.forEach {
-                val melding: AktivitetsPlanFeilMelding = mapper.readValue(it.value())
-                val avtaleId = it.key(); // Kafka key er funksjonell id som altså skal være avtaleId.
-                val hendelseMelding = database.hentEntitetMedAvtaleId(UUID.fromString(avtaleId));
-                // Log error om det er en melding vi har sendt
-                if (!hendelseMelding.isNullOrEmpty()) {
-                    log.error("Feil fra aktivitetsplan for avtale ${avtaleId}. Feilmelding: ${melding.errorMessage}");
-                }else{
-                    log.info("Ikke en Team Tiltak feil fra aktivitetsplan med id ${it.key()} som skal ignoreres.")
-                }
+                /*val melding: AktivitetsPlanFeilMelding = mapper.readValue(it.value())
+               val avtaleId = it.key(); // Kafka key er funksjonell id som altså skal være avtaleId.
+              val hendelseMelding = database.hentEntitetMedAvtaleId(UUID.fromString(avtaleId));
+               // Log error om det er en melding vi har sendt
+               if (!hendelseMelding.isNullOrEmpty()) {
+                   log.error("Feil fra aktivitetsplan for avtale ${avtaleId}. Feilmelding: ${melding.errorMessage}");
+               }else{
+                   log.info("Ikke en Team Tiltak feil fra aktivitetsplan med id ${it.key()} som skal ignoreres.")
+               }*/
+                log.info("Ikke en Team Tiltak feil fra aktivitetsplan med id ${it.key()} som skal ignoreres.")
+
             }
             consumer.commitAsync()
         }

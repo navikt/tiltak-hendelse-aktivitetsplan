@@ -7,8 +7,7 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.util.*
 
 fun feilConsumerConfig() = Properties().apply {
-    put(ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 300000) // Increase this value as needed
-    put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 10) // Decrease this value as needed
+    put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1)
     put(ConsumerConfig.GROUP_ID_CONFIG, "dab-aktivitetskort-feil-1")
     put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false)
     put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
