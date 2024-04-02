@@ -35,7 +35,7 @@ class FeilConsumer(
                }else{
                    log.info("Ikke en Team Tiltak feil fra aktivitetsplan med id ${it.key()} som skal ignoreres.")
                }*/
-                log.info("Ikke en Team Tiltak feil fra aktivitetsplan med id ${it.key()} som skal ignoreres.")
+               // log.info("Ikke en Team Tiltak feil fra aktivitetsplan med id ${it.key()} som skal ignoreres.")
 
             }
             consumer.commitAsync()
