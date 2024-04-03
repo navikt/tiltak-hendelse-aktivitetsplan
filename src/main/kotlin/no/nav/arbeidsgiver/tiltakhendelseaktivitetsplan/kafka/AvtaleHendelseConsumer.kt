@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.HendelseMeldingFeiletEntitet
@@ -46,7 +44,9 @@ class AvtaleHendelseConsumer(
                         mottattTidspunkt = LocalDateTime.now(),
                         feilmelding = e.toString()
                     )
-                    database.lagreNyHendelseMeldingFeiletEntitet(hendelseMeldingFeiletEntitet)
+                    withContext(Dispatchers.IO) {
+                        database.lagreNyHendelseMeldingFeiletEntitet(hendelseMeldingFeiletEntitet)
+                    }
                     consumer.commitAsync()
                     return@forEach
                 }
@@ -76,7 +76,9 @@ class AvtaleHendelseConsumer(
                     topicOffset = it.offset(),
                     producerTopicOffset = null
                 )
-                database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
+                withContext(Dispatchers.IO) {
+                    database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
+                }
                 consumer.commitAsync()
                 // kjør en asynkron co-routine
                 if (melding.annullertGrunn.equals("Feilregistrering")) {
