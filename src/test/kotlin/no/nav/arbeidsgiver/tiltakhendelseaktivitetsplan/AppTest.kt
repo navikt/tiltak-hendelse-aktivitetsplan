@@ -1,33 +1,35 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan
 
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.server.testing.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.runTest
 import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.DatabaseTest
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.testDataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.*
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
-import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.h2.tools.Server
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
+// https://navikt.github.io/veilarbaktivitet/aktivitetskortV1
 class ApplicationTest {
+
+    val mapper = jacksonObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .registerModule(JavaTimeModule())
+
     @Test
     fun testApp() = runTest {
         testApplication {
@@ -39,8 +41,14 @@ class ApplicationTest {
                 put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
             }
 
+            val avtaleID  = "66276156-9bc6-11ed-a8fc-0242ac120002"
+            val database = Database(testDataSource)
+            database.lagreNyAktivitetsplanMeldingEntitet(lagreEnAktivitetsplanMeldingEntitetFraDab(avtaleID))
+
             val testProducer = KafkaProducer<String, String>(producerProps)
-            testProducer.send(ProducerRecord(Topics.AVTALE_HENDELSE, "1", enMelding().trimMargin()))
+            testProducer.send(ProducerRecord(Topics.AVTALE_HENDELSE, avtaleID, enAvtaleHendelseMelding().trimMargin()))
+            testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, avtaleID, enFeilMeldingFraDab().trimMargin()))
+            testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, UUID.randomUUID().toString(), enFeilMeldingFraDab().trimMargin()))
 
             val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
             val kasseringSchema = JSONSchema.parseFile("src/test/resources/schema-kassering.yml")
@@ -48,17 +56,17 @@ class ApplicationTest {
             val consumer: Consumer<String, String> = KafkaConsumer(testConsumerConfig(kafkaContainer.bootstrapServers))
             val feilConsumer: Consumer<String, String> = KafkaConsumer(testConsumerConfig(kafkaContainer.bootstrapServers))
             //val producer: Producer<String, String> = KafkaProducer(testProducerConfig())
-            val database = Database(testDataSource)
+
             val aktivitetsplanProducer = AktivitetsplanProducer(testProducer, database, schema, kasseringSchema)
             val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
             val aktivitetsplanFeilConsumer = FeilConsumer(feilConsumer, database)
 
             val scope = CoroutineScope(Dispatchers.Default)
-            val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer,scope)
+            val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer)
             Server.createWebServer().start()
 
-            val result = withTimeoutOrNull(5000) { // Timeout after 8000 milliseconds (8 seconds)
-                scope.launch {
+            val result = withTimeoutOrNull(10000) { // Timeout etter (10 sekunder)
+                scope.launch {// UTEN SCOPE VIL FEIL CONSUMER ALDRI KUNNE LESE FRA database
                     app.start()
                 }
             }
@@ -69,13 +77,30 @@ class ApplicationTest {
             }
 
             delay(1000)
+            val dataBehandletOgLagret: List<AktivitetsplanMeldingEntitet>? = database.hentEntitetMedAvtaleId(UUID.fromString(avtaleID))
+
             testProducer.close()
-            val dataBehandletOgLagret: List<AktivitetsplanMeldingEntitet>? = database.hentEntitetMedAvtaleId(UUID.fromString("66276156-9bc6-11ed-a8fc-0242ac120002"))
             kafkaContainer.close()
             assertNotEquals(0,dataBehandletOgLagret?.size)
         }
     }
-    fun enMelding():String{
+
+    private fun lagreEnAktivitetsplanMeldingEntitetFraDab(avtaleIDtilTesten: String): AktivitetsplanMeldingEntitet {
+        return AktivitetsplanMeldingEntitet(
+            id = UUID.randomUUID(),
+            avtaleId = UUID.fromString(avtaleIDtilTesten),
+            avtaleStatus = AvtaleStatus.GJENNOMFØRES,
+            opprettetTidspunkt = LocalDateTime.now(),
+            hendelseType = HendelseType.AVTALE_FORLENGET,
+            mottattJson = "",
+            sendingJson = "",
+            sendt = false,
+            topicOffset = 1235346L,
+            producerTopicOffset = 54321L
+        )
+    }
+
+    fun enAvtaleHendelseMelding():String{
        return "{\n" +
                 "        \"hendelseType\": \"OPPRETTET\",\n" +
                 "        \"avtaleStatus\": \"GJENNOMFØRES\",\n" +
@@ -174,5 +199,14 @@ class ApplicationTest {
                 "        \"utførtAv\": \"Z123456\",\n" +
                 "        \"utførtAvRolle\": \"VEILEDER\"\n" +
                 "    }"
+    }
+
+    fun enFeilMeldingFraDab():String{
+       return mapper.writeValueAsString(AktivitetsPlanFeilMelding(
+            timestamp = LocalDateTime.now(),
+            failingMessage = "Failing message",
+            errorMessage = "Error message",
+           errorType = "ULOVLIG_ENDRING"
+        ))
     }
 }

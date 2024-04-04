@@ -24,7 +24,7 @@ class AvtaleHendelseConsumer(
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .registerModule(JavaTimeModule())
 
-     suspend fun start()   {
+      fun start()  = runBlocking    {
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
         while (true) {
@@ -76,6 +76,8 @@ class AvtaleHendelseConsumer(
                     topicOffset = it.offset(),
                     producerTopicOffset = null
                 )
+                println("CONSUMER LAGRER MELDING: ${aktivitetsplanMeldingEntitet.avtaleId} ${aktivitetsplanMeldingEntitet.hendelseType}" ) //TODO Fjern meg
+
                 database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
                 consumer.commitAsync()
                 // kjør en asynkron co-routine
