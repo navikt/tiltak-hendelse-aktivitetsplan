@@ -24,7 +24,7 @@ class AvtaleHendelseConsumer(
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .registerModule(JavaTimeModule())
 
-    fun start() = runBlocking {
+     suspend fun start()   {
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
         while (true) {
@@ -44,12 +44,12 @@ class AvtaleHendelseConsumer(
                         mottattTidspunkt = LocalDateTime.now(),
                         feilmelding = e.toString()
                     )
-                    withContext(Dispatchers.IO) {
-                        database.lagreNyHendelseMeldingFeiletEntitet(hendelseMeldingFeiletEntitet)
-                    }
+                    database.lagreNyHendelseMeldingFeiletEntitet(hendelseMeldingFeiletEntitet)
+
                     consumer.commitAsync()
                     return@forEach
                 }
+
 
                 log.info("Lest melding med avtale-id ${melding.avtaleId}")
                 // Filtrere vekk de som ikke skal til aktivitetplan
@@ -76,9 +76,7 @@ class AvtaleHendelseConsumer(
                     topicOffset = it.offset(),
                     producerTopicOffset = null
                 )
-                withContext(Dispatchers.IO) {
-                    database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
-                }
+                database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
                 consumer.commitAsync()
                 // kjør en asynkron co-routine
                 if (melding.annullertGrunn.equals("Feilregistrering")) {

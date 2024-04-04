@@ -6,6 +6,7 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -20,7 +21,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import java.io.Closeable
 
-class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private val aktivitetsplanFeilConsumer: FeilConsumer) : Closeable {
+class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private val aktivitetsplanFeilConsumer: FeilConsumer, private val scope:CoroutineScope? = null) : Closeable {
     private val logger = KotlinLogging.logger {}
     private val server = embeddedServer(Netty, port = 8080) {
 
@@ -33,9 +34,15 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private va
     suspend fun start() {
         logger.info("Starter applikasjon :)")
         server.start()
-        coroutineScope {
-            launch { avtaleHendelseConsumer.start() }
-            launch { aktivitetsplanFeilConsumer.start() }
+        if(scope != null){ // Brukes i integrasjontesten @{AppTest.kt}
+            scope.launch {avtaleHendelseConsumer.start()   }
+           // scope.launch { aktivitetsplanFeilConsumer.start() }
+        }
+        else{
+            coroutineScope {
+                launch { avtaleHendelseConsumer.start() }
+             //   launch { aktivitetsplanFeilConsumer.start() }
+            }
         }
     }
 

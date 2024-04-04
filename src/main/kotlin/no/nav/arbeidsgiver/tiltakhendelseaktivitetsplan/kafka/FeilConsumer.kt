@@ -19,7 +19,7 @@ class FeilConsumer(
     private val consumer: Consumer<String, String>,
     private val database: Database
 ) {
-    fun start() = runBlocking {
+    suspend fun start()  {
         log.info("Starter konsumering på topic: ${Topics.AKTIVITETSPLAN_FEIL}")
         val mapper = jacksonObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -31,9 +31,7 @@ class FeilConsumer(
             records.forEach {
                 val melding: AktivitetsPlanFeilMelding = mapper.readValue(it.value())
                 val avtaleId = it.key(); // Kafka key er funksjonell id som altså skal være avtaleId.
-                val hendelseMelding: List<AktivitetsplanMeldingEntitet>? = withContext(Dispatchers.IO) {
-                    database.hentEntitetMedAvtaleId(UUID.fromString(avtaleId));
-                }
+                val hendelseMelding: List<AktivitetsplanMeldingEntitet>? =  database.hentEntitetMedAvtaleId(UUID.fromString(avtaleId));
                // Log error om det er en melding vi har sendt
                if (!hendelseMelding.isNullOrEmpty()) {
                    log.error("Feil fra aktivitetsplan for avtale ${avtaleId}. Feilmelding: ${melding.errorMessage}");
