@@ -35,13 +35,16 @@ class App(private val avtaleHendelseConsumer: AvtaleHendelseConsumer, private va
         logger.info("Starter applikasjon :)")
         server.start()
         if(scope != null){ // Brukes i integrasjontesten @{AppTest.kt}
-            scope.launch {avtaleHendelseConsumer.start()   }
-           // scope.launch { aktivitetsplanFeilConsumer.start() }
+            coroutineScope{
+                scope.launch {avtaleHendelseConsumer.start()   }
+                scope.launch { aktivitetsplanFeilConsumer.start() }
+            }
+
         }
         else{
             coroutineScope {
                 launch { avtaleHendelseConsumer.start() }
-             //   launch { aktivitetsplanFeilConsumer.start() }
+                launch { aktivitetsplanFeilConsumer.start() }
             }
         }
     }
