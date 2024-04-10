@@ -76,7 +76,6 @@ class AvtaleHendelseConsumer(
                     topicOffset = it.offset(),
                     producerTopicOffset = null
                 )
-                println("CONSUMER LAGRER MELDING: ${aktivitetsplanMeldingEntitet.avtaleId} ${aktivitetsplanMeldingEntitet.hendelseType}" ) //TODO Fjern meg
 
                 database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
                 consumer.commitAsync()
