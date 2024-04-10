@@ -16,6 +16,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.h2.tools.Server
+import org.junit.jupiter.api.Disabled
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import java.time.LocalDateTime
@@ -31,7 +32,7 @@ class ApplicationTest {
         .registerModule(JavaTimeModule())
 
     @Test
-    fun testApp() = runTest {
+    fun testKomplettApp() = runTest {
         testApplication {
             val kafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.0"))
             kafkaContainer.start()
@@ -47,8 +48,8 @@ class ApplicationTest {
 
             val testProducer = KafkaProducer<String, String>(producerProps)
             testProducer.send(ProducerRecord(Topics.AVTALE_HENDELSE, avtaleID, enAvtaleHendelseMelding().trimMargin()))
-            testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, avtaleID, enFeilMeldingFraDab().trimMargin()))
-            testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, UUID.randomUUID().toString(), enFeilMeldingFraDab().trimMargin()))
+            testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, avtaleID, enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
+            testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, UUID.randomUUID().toString(), enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
 
             val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
             val kasseringSchema = JSONSchema.parseFile("src/test/resources/schema-kassering.yml")
@@ -84,6 +85,7 @@ class ApplicationTest {
             assertNotEquals(0,dataBehandletOgLagret?.size)
         }
     }
+
 
     private fun lagreEnAktivitetsplanMeldingEntitetFraDab(avtaleIDtilTesten: String): AktivitetsplanMeldingEntitet {
         return AktivitetsplanMeldingEntitet(
@@ -201,7 +203,7 @@ class ApplicationTest {
                 "    }"
     }
 
-    fun enFeilMeldingFraDab():String{
+    fun enFeilMeldingFraTeamDab_aktivitetsplan():String{
        return mapper.writeValueAsString(AktivitetsPlanFeilMelding(
             timestamp = LocalDateTime.now(),
             failingMessage = "Failing message",
@@ -209,4 +211,74 @@ class ApplicationTest {
            errorType = "ULOVLIG_ENDRING"
         ))
     }
+
+
+    /**
+     * Eksperiment som beviser hvordan flere runBlocking blokkerer flere coroutines.
+     * Det er best å unngå dem i noen annet enn main metode i en java applikasjon.
+     */
+    @Test
+    @Disabled
+    internal fun utenBlockRunningTest_DenBlokkerer_Ikke_Coroutine1_og_Coroutine2(){
+        runBlocking {
+            runner_UTEN_Run_Blocking()
+        }
+    }
+
+
+    @Test
+    @Disabled
+    internal fun blockRunningTest_DenBlokkerer_Coroutine2_MenIkke_1() {
+        runBlocking {runnerBlocking()}
+    }
+    internal suspend fun runner_UTEN_Run_Blocking(){
+        val scope = kotlinx.coroutines.CoroutineScope(Dispatchers.Default)
+
+        // Create a single instance of the repository
+        val repository = MyDatabaseRepositoryMock()
+
+        // Launch two coroutines
+        scope.launch {
+                while (true) {
+                    val data = repository.hentData()
+                    println("Coroutine 1: Fetched data - $data")
+                    //yield()
+                }
+            }
+
+        scope.launch {
+                while (true) {
+                    val data = repository.hentData()
+                    println("Coroutine 2: Fetched data - $data")
+                   // yield()
+                }
+            }
+
+        delay(Long.MAX_VALUE)
+    }
+
+    internal suspend fun  runnerBlocking(){
+        val repository = MyDatabaseRepositoryMock()
+        coroutineScope{
+            launch {
+                runBlocking { while (true) {
+                    val data = repository.hentData()
+                    println("Coroutine 1: Fetched data - $data")
+                } }
+            }
+            launch {
+                runBlocking {  while (true) {
+                    val data = repository.hentData()
+                    println("Coroutine 2: Fetched data - $data")
+                }}
+            }
+        }
+    }
+
+    internal class MyDatabaseRepositoryMock()  {
+        suspend fun hentData(): String {
+            return "Data from database"
+        }
+    }
+
 }
