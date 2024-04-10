@@ -6,7 +6,6 @@ import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -52,7 +51,7 @@ suspend fun main() {
     val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
     val feilConsumer: Consumer<String, String> = KafkaConsumer(feilConsumerConfig())
     val producer: Producer<String, String> = KafkaProducer(producerConfig())
-    val database = Database(dataSource) //TODO: Blokkerer Ulike Coroutine -> Deles ikke godt
+    val database = Database(dataSource)
     val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema, kasseringSchema)
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
     val aktivitetsplanFeilConsumer = FeilConsumer(feilConsumer, database)
