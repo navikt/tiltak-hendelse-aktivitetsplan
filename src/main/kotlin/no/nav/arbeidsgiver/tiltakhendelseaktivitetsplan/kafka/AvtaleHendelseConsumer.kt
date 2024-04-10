@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.HendelseMeldingFeiletEntitet
@@ -24,7 +26,7 @@ class AvtaleHendelseConsumer(
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .registerModule(JavaTimeModule())
 
-      fun start()  = runBlocking    {
+    fun start() = runBlocking {
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
         while (true) {
@@ -45,11 +47,9 @@ class AvtaleHendelseConsumer(
                         feilmelding = e.toString()
                     )
                     database.lagreNyHendelseMeldingFeiletEntitet(hendelseMeldingFeiletEntitet)
-
                     consumer.commitAsync()
                     return@forEach
                 }
-
 
                 log.info("Lest melding med avtale-id ${melding.avtaleId}")
                 // Filtrere vekk de som ikke skal til aktivitetplan
@@ -76,7 +76,6 @@ class AvtaleHendelseConsumer(
                     topicOffset = it.offset(),
                     producerTopicOffset = null
                 )
-
                 database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
                 consumer.commitAsync()
                 // kjør en asynkron co-routine

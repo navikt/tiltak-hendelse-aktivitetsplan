@@ -207,8 +207,7 @@ class ApplicationTest {
        return mapper.writeValueAsString(AktivitetsPlanFeilMelding(
             timestamp = LocalDateTime.now(),
             failingMessage = "Failing message",
-            errorMessage = "Error message",
-           errorType = "ULOVLIG_ENDRING"
+            errorMessage = "Error message"
         ))
     }
 
