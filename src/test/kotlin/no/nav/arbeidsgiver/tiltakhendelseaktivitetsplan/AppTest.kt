@@ -25,7 +25,7 @@ import kotlin.test.Test
 import kotlin.test.assertNotEquals
 
 // https://navikt.github.io/veilarbaktivitet/aktivitetskortV1
-class ApplicationTest {
+class AppTest {
 
     val mapper = jacksonObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
