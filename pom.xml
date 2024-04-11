@@ -112,6 +112,14 @@
                     <groupId>io.ktor</groupId>
                     <artifactId>ktor-server-call-logging-jvm</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jetbrains.kotlinx</groupId>
+                    <artifactId>kotlinx-coroutines-slf4j</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
