@@ -1,16 +1,16 @@
-name: Bygg og deploy branch til dev-gcp
+name: Bygg og deploy branch til dev
 
-on: workflow_dispatch
-
-env:
-  GITHUB_REPOSITORY: ${{ github.repository }}
-  IMAGE: ghcr.io/${{ github.repository }}/tiltak-hendelse-aktivitetsplan:${{ github.sha }}
+on:
+  workflow_dispatch
 
 jobs:
   bygg:
     name: Bygg
     permissions:
+      contents: read
       packages: write
+    outputs:
+      image: ${{ steps.docker-build-push.outputs.image }}
     runs-on: ubuntu-latest
     steps:
       - name: Sjekk ut kode
@@ -26,26 +26,27 @@ jobs:
       - name: Bygg og test med Maven
         run: mvn package -B -Dsurefire.useFile=false
 
-      - name: Bygg, tag og push Docker-image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo ${GITHUB_TOKEN} | docker login ghcr.io -u ${GITHUB_REPOSITORY} --password-stdin
-          docker build --tag ${IMAGE} .
-          docker push ${IMAGE}
+      - name: Push docker image to GAR
+        uses: nais/docker-build-push@v0
+        id: docker-build-push
+        with:
+          team: team-tiltak
+          identity_provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
 
   deploy-dev:
-    name: Deploy til dev
+    name: Deploy til dev-gcp
     runs-on: ubuntu-latest
     needs: bygg
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Sjekk ut kode
-        uses: actions/checkout@v2
-
+        uses: actions/checkout@v4
       - name: Deploy til dev-gcp
-        uses: nais/deploy/actions/deploy@v1
+        uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
           VARS: .nais/dev.yaml
