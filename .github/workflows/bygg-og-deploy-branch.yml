@@ -1,14 +1,18 @@
 name: Bygg og deploy branch
 
 on:
-  workflow_dispatch
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+      - '!main'
 
 jobs:
   bygg:
     name: Bygg
     permissions:
       contents: read
-      packages: write
+      id-token: write
     outputs:
       image: ${{ steps.docker-build-push.outputs.image }}
     runs-on: ubuntu-latest
