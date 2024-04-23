@@ -1,4 +1,4 @@
-name: Bygg og deploy branch til dev
+name: Bygg og deploy branch
 
 on:
   workflow_dispatch
@@ -44,10 +44,12 @@ jobs:
     steps:
       - name: Sjekk ut kode
         uses: actions/checkout@v4
+
       - name: Deploy til dev-gcp
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
           VARS: .nais/dev.yaml
+          VAR: image=${{ needs.bygg.outputs.image }}
           PRINT_PAYLOAD: true
