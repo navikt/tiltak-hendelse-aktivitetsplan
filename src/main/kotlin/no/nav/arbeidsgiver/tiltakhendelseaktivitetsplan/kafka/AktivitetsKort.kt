@@ -36,7 +36,7 @@ data class AktivitetsKort(
                 //  beskrivelse = "Dette er en beskrivelse",
                 aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
-                endretTidspunkt = melding.sistEndret,
+                endretTidspunkt = if (melding.hendelseType == HendelseType.STATUSENDRING) Instant.now() else melding.sistEndret,
                 avtaltMedNav = melding.veilederNavIdent != null,
                 oppgave = null,
                 handlinger = listOf(
