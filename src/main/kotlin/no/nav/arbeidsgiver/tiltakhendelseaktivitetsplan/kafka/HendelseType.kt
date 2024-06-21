@@ -48,5 +48,6 @@ enum class HendelseType(val tekst: String, val skalTilAktivitetsplan: Boolean) {
     GODKJENT_FOR_ETTERREGISTRERING("Avtale er godkjent for etterregistrering", false),
     FJERNET_ETTERREGISTRERING("Fjernet etterregistrering på avtale", false),
     DELTAKERS_GODKJENNING_OPPHEVET_AV_VEILEDER("Deltakers godkjenning opphevet av veileder", false),
-    DELTAKERS_GODKJENNING_OPPHEVET_AV_ARBEIDSGIVER("Deltakers godkjenning opphevet av arbeidsgiver", false)
+    DELTAKERS_GODKJENNING_OPPHEVET_AV_ARBEIDSGIVER("Deltakers godkjenning opphevet av arbeidsgiver", false),
+    ARBEIDSGIVERS_GODKJENNING_OPPHEVET_AV_VEILEDER("Arbeidsgivers godkjenning opphevet av veileder", false)
 }
