@@ -11,6 +11,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanM
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.testDataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.*
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -21,6 +22,7 @@ import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import java.time.LocalDateTime
 import java.util.*
+import kotlin.math.log
 import kotlin.test.Test
 import kotlin.test.assertNotEquals
 
@@ -41,13 +43,13 @@ class AppTest {
                 put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
             }
 
-            val avtaleID  = "66276156-9bc6-11ed-a8fc-0242ac120002"
+            val avtaleID  = AvtaleId("66276156-9bc6-11ed-a8fc-0242ac120002")
             val database = Database(testDataSource)
             database.lagreNyAktivitetsplanMeldingEntitet(lagreEnAktivitetsplanMeldingEntitetFraDab(avtaleID))
 
             val testProducer = KafkaProducer<String, String>(producerProps)
-            testProducer.send(ProducerRecord(Topics.AVTALE_HENDELSE, avtaleID, enAvtaleHendelseMelding().trimMargin()))
-            testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, avtaleID, enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
+            testProducer.send(ProducerRecord(Topics.AVTALE_HENDELSE, avtaleID.toString(), enAvtaleHendelseMelding().trimMargin()))
+            testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, avtaleID.toString(), enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
             testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, UUID.randomUUID().toString(), enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
 
             val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
@@ -77,19 +79,19 @@ class AppTest {
             }
 
             delay(1000)
-            val dataBehandletOgLagret: List<AktivitetsplanMeldingEntitet>? = database.hentEntitetMedAvtaleId(UUID.fromString(avtaleID))
+            val dataBehandletOgLagret: List<AktivitetsplanMeldingEntitet> = database.hentEntitet(avtaleID)
 
             testProducer.close()
             kafkaContainer.close()
-            assertNotEquals(0,dataBehandletOgLagret?.size)
+            assertNotEquals(0,dataBehandletOgLagret.size)
         }
     }
 
 
-    private fun lagreEnAktivitetsplanMeldingEntitetFraDab(avtaleIDtilTesten: String): AktivitetsplanMeldingEntitet {
+    private fun lagreEnAktivitetsplanMeldingEntitetFraDab(avtaleIDtilTesten: AvtaleId): AktivitetsplanMeldingEntitet {
         return AktivitetsplanMeldingEntitet(
             id = UUID.randomUUID(),
-            avtaleId = UUID.fromString(avtaleIDtilTesten),
+            avtaleId = avtaleIDtilTesten,
             avtaleStatus = AvtaleStatus.GJENNOMFØRES,
             opprettetTidspunkt = LocalDateTime.now(),
             hendelseType = HendelseType.AVTALE_FORLENGET,

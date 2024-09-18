@@ -1,17 +1,16 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database
 
 import com.zaxxer.hikari.HikariDataSource
-import kotliquery.HikariCP
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanId
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleId
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.flywaydb.core.Flyway
 import java.util.*
 
 class Database(val dataSource: HikariDataSource) {
-    //private val dataSource: HikariDataSource = hikari()
-
 
     init {
         val flyway = Flyway.configure()
@@ -22,16 +21,17 @@ class Database(val dataSource: HikariDataSource) {
     }
 
     fun lagreNyAktivitetsplanMeldingEntitet(entitet: AktivitetsplanMeldingEntitet) {
+        //language=postgresql
         val query: String = """
             insert into aktivitetsplan_melding (id, avtale_id, avtale_status, opprettet_tidspunkt, hendelse_type, mottatt_json, sending_json, sendt, topic_offset, producer_topic_offset) values
             (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent();
+        """.trimIndent()
         using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf(
                     query,
                     entitet.id,
-                    entitet.avtaleId,
+                    entitet.avtaleId.value,
                     entitet.avtaleStatus.name,
                     entitet.opprettetTidspunkt,
                     entitet.hendelseType.name,
@@ -47,21 +47,24 @@ class Database(val dataSource: HikariDataSource) {
     }
 
     fun hentEntitet(id: UUID): AktivitetsplanMeldingEntitet? {
-        val query: String = "select * from aktivitetsplan_melding where id = ?"
+        //language=postgresql
+        val query = "select * from aktivitetsplan_melding where id = ?"
         return using(sessionOf(dataSource)) { session ->
             session.run(queryOf(query, id).map(tilAktivitetsplanMeldingEntitet).asSingle)
         }
     }
 
-    fun hentEntitetMedAvtaleId(avtaleId: UUID): List<AktivitetsplanMeldingEntitet>? {
+    fun hentEntitet(avtaleId: AvtaleId): List<AktivitetsplanMeldingEntitet> {
+        //language=postgresql
         val query = "select * from aktivitetsplan_melding where avtale_id = ?"
         return using(sessionOf(dataSource)) { session ->
-            session.run(queryOf(query, avtaleId).map(tilAktivitetsplanMeldingEntitet).asList)
+            session.run(queryOf(query, avtaleId.value).map(tilAktivitetsplanMeldingEntitet).asList)
         }
     }
 
     fun settEntitetTilSendt(id: UUID, offset: Long) {
-        val query: String = """
+        //language=postgresql
+        val query = """
             update aktivitetsplan_melding set sendt = true, producer_topic_offset = ?, feilmelding = null where id = ?
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
@@ -70,7 +73,8 @@ class Database(val dataSource: HikariDataSource) {
     }
 
     fun settFeilmeldingPåEntitet(id: UUID, feilmelding: String) {
-        val query: String = """
+        //language=postgresql
+        val query = """
             update aktivitetsplan_melding set feilmelding = ? where id = ?
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
@@ -79,7 +83,8 @@ class Database(val dataSource: HikariDataSource) {
     }
 
     fun settEntitetSendingJson(id: UUID, meldingJson: String) {
-        val query: String = """
+        //language=postgresql
+        val query = """
             update aktivitetsplan_melding set sending_json = ? where id = ?
         """.trimIndent()
         using(sessionOf(dataSource)) { session ->
@@ -88,7 +93,8 @@ class Database(val dataSource: HikariDataSource) {
     }
 
     fun lagreNyHendelseMeldingFeiletEntitet(hendelseMeldingFeiletEntitet: HendelseMeldingFeiletEntitet) {
-        val query: String = """
+        //language=postgresql
+        val query = """
             insert into hendelse_melding_feilet (id, avtale_id, mottatt_tidspunkt, mottatt_json, topic_offset, feilmelding) values
             (?, ?, ?, ?, ?, ?)
         """.trimIndent();
@@ -108,4 +114,14 @@ class Database(val dataSource: HikariDataSource) {
         log.info("Lagret feilet hendelse i database")
     }
 
+    fun lagreAktivitetsplanId(avtaleId: AvtaleId, aktivitetsplanId: AktivitetsplanId) {
+        //language=postgresql
+        val query = "insert into aktivitetsplan_id (avtale_id, aktivitetsplan_id) values (?, ?) on conflict do nothing"
+        using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf(query, avtaleId.value, aktivitetsplanId.value).asUpdate
+            )
+        }
+        log.info("Lagret aktivitetsplanId i database")
+    }
 }
