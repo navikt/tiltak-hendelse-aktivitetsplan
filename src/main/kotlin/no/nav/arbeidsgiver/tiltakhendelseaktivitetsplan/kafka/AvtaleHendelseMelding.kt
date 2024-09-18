@@ -2,11 +2,9 @@ package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.*
 
 data class AvtaleHendelseMelding(
     val hendelseType: HendelseType,
@@ -22,7 +20,7 @@ data class AvtaleHendelseMelding(
     val utførtAv: String,
     val utførtAvRolle: AvtaleHendelseUtførtAvRolle,
     val deltakerFnr: String,
-    @JsonDeserialize(using = AvtaleId::class)
+    @JsonDeserialize(using = AvtaleId.Deserializer::class)
     val avtaleId: AvtaleId,
     val avtaleNr: Int,
     val sistEndret: Instant,

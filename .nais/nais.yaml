@@ -6,9 +6,14 @@ metadata:
   labels:
     "team": "team-tiltak"
 spec:
+  azure:
+    application:
+      enabled: true
   kafka:
     pool: {{kafka-pool}}
   image: {{image}}
+  ingresses:
+    - {{ingress}}
   liveness:
     path: "/tiltak-hendelse-aktivitetsplan/internal/isAlive"
     initialDelay: 20
@@ -35,3 +40,9 @@ spec:
       databases:
         - name: tiltak-hendelse-aktivitetsplan-db
           envVarPrefix: DB
+  accessPolicy:
+    inbound:
+      rules:
+        - application: tiltaksgjennomforing-api
+          namespace: arbeidsgiver
+          cluster: {{tiltaksgjennomforing-cluster}}

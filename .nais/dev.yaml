@@ -1,2 +1,4 @@
 kafka-pool: nav-dev
 db-tier: db-f1-micro
+tiltaksgjennomforing-cluster: dev-fss
+ingress: https://tiltak-hendelse-aktivitetsplan.intern.dev.nav.no

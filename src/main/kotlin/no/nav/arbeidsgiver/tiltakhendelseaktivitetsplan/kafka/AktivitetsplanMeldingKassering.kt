@@ -6,7 +6,7 @@ import java.util.*
 data class AktivitetsplanMeldingKassering(
     val source: String,
     val actionType: String,
-    @JsonSerialize(using = AktivitetsplanId::class)
+    @JsonSerialize(using = AktivitetsplanId.Serializer::class)
     val aktivitetsId: AktivitetsplanId,
     val personIdent: String,
     val navIdent: String,

@@ -21,7 +21,7 @@ suspend fun main() {
     val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
     val aktivitetsplanFeilConsumer = FeilConsumer(consumer, database)
 
-    val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer)
+    val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer, database)
     Server.createWebServer().start()
     app.start()
 }

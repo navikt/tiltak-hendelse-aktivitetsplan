@@ -1,2 +1,4 @@
 kafka-pool: nav-prod
 db-tier: db-custom-1-3840
+tiltaksgjennomforing-cluster: prod-fss
+ingress: https://tiltak-hendelse-aktivitetsplan.intern.nav.no
