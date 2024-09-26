@@ -124,4 +124,29 @@ class Database(val dataSource: HikariDataSource) {
         }
         log.info("Lagret aktivitetsplanId i database")
     }
+
+    fun hentAktivitetsplanId(avtaleId: AvtaleId): AktivitetsplanId? {
+        //language=postgresql
+        val query = "select aktivitetsplan_id from aktivitetsplan_id where avtale_id = ?"
+        return using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf(query, avtaleId.value)
+                    .map{ AktivitetsplanId(it.string("aktivitetsplan_id")) }
+                    .asSingle
+            )
+        }
+    }
+
+    fun hentAvtaleId(aktivitetsplanId: AktivitetsplanId): AvtaleId? {
+        //language=postgresql
+        val query = "select avtale_id from aktivitetsplan_id where avtale_id = ?"
+        return using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf(query, aktivitetsplanId.value)
+                    .map{ AvtaleId(it.string("aktivitetsplan_id")) }
+                    .asSingle
+            )
+        }
+    }
+
 }

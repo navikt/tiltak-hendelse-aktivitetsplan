@@ -7,4 +7,10 @@ data class AktivitetsplanId(val value: UUID) {
     override fun toString(): String {
         return value.toString()
     }
+
+    companion object {
+        fun fromAvtaleId(avtaleId: AvtaleId): AktivitetsplanId {
+            return AktivitetsplanId(avtaleId.value)
+        }
+    }
 }

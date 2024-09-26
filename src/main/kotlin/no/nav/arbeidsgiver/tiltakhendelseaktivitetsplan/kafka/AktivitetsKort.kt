@@ -26,9 +26,9 @@ data class AktivitetsKort(
 
 ) {
     companion object {
-        fun fromHendelseMelding(melding: AvtaleHendelseMelding): AktivitetsKort {
+        fun fromHendelseMelding(aktivitetsplanId: AktivitetsplanId, melding: AvtaleHendelseMelding): AktivitetsKort {
             return AktivitetsKort(
-                id = melding.avtaleId,
+                id = aktivitetsplanId.value,
                 personIdent = melding.deltakerFnr,
                 startDato = melding.startDato,
                 sluttDato = melding.sluttDato,

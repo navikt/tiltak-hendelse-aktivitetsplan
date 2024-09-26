@@ -11,11 +11,11 @@ data class AktivitetsplanMeldingKassering(
     val messageId: String
 ) {
     companion object {
-        fun fromHendelseMelding(melding: AvtaleHendelseMelding): AktivitetsplanMeldingKassering {
+        fun fromHendelseMelding(aktivitetsplanId: AktivitetsplanId, melding: AvtaleHendelseMelding): AktivitetsplanMeldingKassering {
             return AktivitetsplanMeldingKassering(
                 source = "TEAM_TILTAK",
                 actionType = "KASSER_AKTIVITET",
-                aktivitetsId = melding.avtaleId,
+                aktivitetsId = aktivitetsplanId.value,
                 personIdent = melding.deltakerFnr,
                 navIdent = melding.veilederNavIdent.toString(),
                 messageId = UUID.randomUUID().toString()
