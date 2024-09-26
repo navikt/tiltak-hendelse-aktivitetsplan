@@ -10,7 +10,8 @@ data class AktivitetsplanId(val value: UUID) {
 
     companion object {
         fun fromAvtaleId(avtaleId: AvtaleId): AktivitetsplanId {
-            return AktivitetsplanId(avtaleId.value)
+            return if (avtaleId.value != null) AktivitetsplanId(avtaleId.value)
+            else throw IllegalArgumentException("AvtaleId kan ikke være null")
         }
     }
 }

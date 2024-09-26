@@ -1,6 +1,8 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,7 +22,8 @@ data class AvtaleHendelseMelding(
     val utførtAv: String,
     val utførtAvRolle: AvtaleHendelseUtførtAvRolle,
     val deltakerFnr: String,
-    val avtaleId: UUID,
+    @JsonDeserialize(using = AvtaleId::class)
+    val avtaleId: AvtaleId,
     val avtaleNr: Int,
     val sistEndret: Instant,
     val veilederNavIdent: String?,

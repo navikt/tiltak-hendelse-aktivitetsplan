@@ -57,7 +57,7 @@ data class AktivitetsKort(
             return Attributt(label = label, verdi = feltVerdi)
         }
 
-        private fun lenke(side: String, avtaleId: UUID): URL {
+        private fun lenke(side: String, avtaleId: AvtaleId): URL {
             val internDev = "https://tiltaksgjennomforing.intern.dev.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=VEILEDER"
             val internProd = "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=VEILEDER"
             val eksternDev = "https://tiltaksgjennomforing.ekstern.dev.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=DELTAKER"

@@ -123,7 +123,7 @@ class MappingKasseringTest {
         mapperFromJson.registerModule(JavaTimeModule())
         val kasseringMelding: AvtaleHendelseMelding = mapperFromJson.readValue(kasseringMeldingJson)
         val aktivitetsplanMeldingKassering = AktivitetsplanMeldingKassering.fromHendelseMelding(
-            aktivitetsplanId = AktivitetsplanId(kasseringMelding.avtaleId),
+            aktivitetsplanId = AktivitetsplanId.fromAvtaleId(kasseringMelding.avtaleId),
             melding = kasseringMelding
         )
 
