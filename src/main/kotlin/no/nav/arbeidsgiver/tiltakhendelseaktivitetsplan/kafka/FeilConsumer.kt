@@ -27,8 +27,8 @@ class FeilConsumer(
             records.isEmpty && continue
             records.forEach {
                 val melding: AktivitetsPlanFeilMelding = mapper.readValue(it.value())
-                val avtaleId = it.key(); // Kafka key er funksjonell id som altså skal være avtaleId.
-                val hendelseMelding = database.hentEntitetMedAvtaleId(UUID.fromString(avtaleId));
+                val avtaleId = AvtaleId(it.key()); // Kafka key er funksjonell id som altså skal være avtaleId.
+                val hendelseMelding = database.hentEntitet(avtaleId);
                 // Log error om det er en melding vi har sendt
                 if (!hendelseMelding.isNullOrEmpty()) {
                     log.error("Feil fra aktivitetsplan for avtale ${avtaleId}. Feilmelding: ${melding.errorMessage}");

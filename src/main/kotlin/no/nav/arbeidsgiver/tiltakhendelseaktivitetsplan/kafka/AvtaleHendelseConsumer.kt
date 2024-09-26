@@ -64,9 +64,10 @@ class AvtaleHendelseConsumer(
                     return@forEach
                 }
 
+                var avtaleId = AvtaleId(melding.avtaleId);
                 val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
                     id = UUID.randomUUID(),
-                    avtaleId = melding.avtaleId,
+                    avtaleId = avtaleId,
                     avtaleStatus = melding.avtaleStatus,
                     opprettetTidspunkt = LocalDateTime.now(),
                     hendelseType = melding.hendelseType,
@@ -77,6 +78,8 @@ class AvtaleHendelseConsumer(
                     producerTopicOffset = null
                 )
                 database.lagreNyAktivitetsplanMeldingEntitet(aktivitetsplanMeldingEntitet)
+                database.lagreAktivitetsplanId(avtaleId, AktivitetsplanId(avtaleId.value))
+
                 consumer.commitAsync()
                 // kjør en asynkron co-routine
                 if (melding.annullertGrunn.equals("Feilregistrering")) {
