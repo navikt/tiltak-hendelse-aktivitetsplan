@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import java.net.URL
@@ -9,7 +10,8 @@ import java.util.*
 
 data class AktivitetsKort(
     // Obligatoriske
-    val id: UUID,
+    @JsonSerialize(using = AktivitetsplanId::class)
+    val id: AktivitetsplanId,
     val personIdent: String,
     val startDato: LocalDate?,
     val sluttDato: LocalDate?,
@@ -28,7 +30,7 @@ data class AktivitetsKort(
     companion object {
         fun fromHendelseMelding(aktivitetsplanId: AktivitetsplanId, melding: AvtaleHendelseMelding): AktivitetsKort {
             return AktivitetsKort(
-                id = aktivitetsplanId.value,
+                id = aktivitetsplanId,
                 personIdent = melding.deltakerFnr,
                 startDato = melding.startDato,
                 sluttDato = melding.sluttDato,
