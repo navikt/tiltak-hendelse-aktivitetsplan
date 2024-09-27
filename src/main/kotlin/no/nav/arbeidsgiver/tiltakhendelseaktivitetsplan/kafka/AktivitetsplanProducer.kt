@@ -28,11 +28,10 @@ class AktivitetsplanProducer(
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     fun sendMelding(entitet: AktivitetsplanMeldingEntitet) {
-        log.info("Sender melding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
+        val aktivitetsplanId = database.hentAktivitetsplanId(entitet.avtaleId)
+            ?: throw IllegalStateException("Fant ikke aktivitetsplanId for avtaleId ${entitet.avtaleId}")
         val melding: AvtaleHendelseMelding = mapper.readValue(entitet.mottattJson)
-        val kafkaKey = melding.avtaleId;
-
-        val aktivitetsKort = AktivitetsKort.fromHendelseMelding(melding)
+        val aktivitetsKort = AktivitetsKort.fromHendelseMelding(aktivitetsplanId, melding)
         val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(
             UUID.randomUUID(),
             "TEAM_TILTAK",
@@ -41,7 +40,13 @@ class AktivitetsplanProducer(
             aktivitetsKort)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
 
-        if(!schema.validate(meldingJson))  {
+        log.info(
+            "Sender melding for avtaleId {} og aktivitetsplanId {} til aktivitetsplan",
+            entitet.avtaleId,
+            aktivitetsplanId
+        )
+
+        if (!schema.validate(meldingJson))  {
             val output = schema.validateBasic(meldingJson)
             output.errors?.forEach {
                 log.error("${it.error} - ${it.instanceLocation}")
@@ -50,7 +55,7 @@ class AktivitetsplanProducer(
             return
         }
 
-        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaKey.toString(), meldingJson)
+        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, aktivitetsplanId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
         producer.send(record) { recordMetadata, exception ->
             when (exception) {
@@ -61,19 +66,24 @@ class AktivitetsplanProducer(
                 }
                 else -> {
                     log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
+                    database.settFeilmeldingPåEntitet(entitet.id, "feilmeldingen her")
                 }
             }
         }
     }
 
     fun sendKasserMelding(entitet: AktivitetsplanMeldingEntitet) {
-        log.info("Sender kasseringsmelding for avtaleId ${entitet.avtaleId} til aktivitetsplan")
+        val aktivitetsplanId = database.hentAktivitetsplanId(entitet.avtaleId)
+            ?: throw IllegalStateException("Fant ikke aktivitetsplanId for avtaleId ${entitet.avtaleId}")
         val melding: AvtaleHendelseMelding = mapper.readValue(entitet.mottattJson)
-        val kafkaKey = melding.avtaleId;
-
-        val kasseringsMelding = AktivitetsplanMeldingKassering.fromHendelseMelding(melding)
+        val kasseringsMelding = AktivitetsplanMeldingKassering.fromHendelseMelding(aktivitetsplanId, melding)
         val meldingJson = mapper.writeValueAsString(kasseringsMelding)
+
+        log.info(
+            "Sender kasseringsmelding for avtaleId {} og aktivitetsplanId {} til aktivitetsplan",
+            entitet.avtaleId,
+            aktivitetsplanId
+        )
 
         if(!kasseringSchema.validate(meldingJson))  {
             val output = kasseringSchema.validateBasic(meldingJson)
@@ -84,7 +94,7 @@ class AktivitetsplanProducer(
             return
         }
 
-        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, kafkaKey.toString(), meldingJson)
+        val record = ProducerRecord(AKTIVITETSPLAN_TOPIC, aktivitetsplanId.toString(), meldingJson)
         database.settEntitetSendingJson(entitet.id, meldingJson)
         producer.send(record) { recordMetadata, exception ->
             when (exception) {
@@ -95,7 +105,7 @@ class AktivitetsplanProducer(
                 }
                 else -> {
                     log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-                    database.settFeilmeldingPåEntitet(melding.avtaleId, "feilmeldingen her")
+                    database.settFeilmeldingPåEntitet(entitet.id, "feilmeldingen her")
                 }
             }
         }

@@ -1,5 +1,6 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import java.net.URL
@@ -9,7 +10,8 @@ import java.util.*
 
 data class AktivitetsKort(
     // Obligatoriske
-    val id: UUID,
+    @JsonSerialize(using = AktivitetsplanId::class)
+    val id: AktivitetsplanId,
     val personIdent: String,
     val startDato: LocalDate?,
     val sluttDato: LocalDate?,
@@ -26,9 +28,9 @@ data class AktivitetsKort(
 
 ) {
     companion object {
-        fun fromHendelseMelding(melding: AvtaleHendelseMelding): AktivitetsKort {
+        fun fromHendelseMelding(aktivitetsplanId: AktivitetsplanId, melding: AvtaleHendelseMelding): AktivitetsKort {
             return AktivitetsKort(
-                id = melding.avtaleId,
+                id = aktivitetsplanId,
                 personIdent = melding.deltakerFnr,
                 startDato = melding.startDato,
                 sluttDato = melding.sluttDato,
@@ -57,7 +59,7 @@ data class AktivitetsKort(
             return Attributt(label = label, verdi = feltVerdi)
         }
 
-        private fun lenke(side: String, avtaleId: UUID): URL {
+        private fun lenke(side: String, avtaleId: AvtaleId): URL {
             val internDev = "https://tiltaksgjennomforing.intern.dev.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=VEILEDER"
             val internProd = "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=VEILEDER"
             val eksternDev = "https://tiltaksgjennomforing.ekstern.dev.nav.no/tiltaksgjennomforing/avtale/${avtaleId}?part=DELTAKER"

@@ -125,7 +125,7 @@ class MappingTest {
     @Test
     fun melding_til_aktivitetsplan_skal_serialiseres() {
         val aktivitetsKort = AktivitetsKort(
-            id = UUID.randomUUID(),
+            id = AktivitetsplanId(UUID.randomUUID()),
             personIdent = "12345678901",
             startDato = LocalDate.now(),
             sluttDato = LocalDate.now(),

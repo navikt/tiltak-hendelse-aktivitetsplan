@@ -10,7 +10,6 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.ConsumerRecords
 import java.time.Duration
-import java.util.*
 
 class FeilConsumer(
     private val consumer: Consumer<String, String>,
@@ -27,8 +26,8 @@ class FeilConsumer(
             records.isEmpty && continue
             records.forEach {
                 val melding: AktivitetsPlanFeilMelding = mapper.readValue(it.value())
-                val avtaleId = AvtaleId(it.key()); // Kafka key er funksjonell id som altså skal være avtaleId.
-                val hendelseMelding = database.hentEntitet(avtaleId);
+                val avtaleId = database.hentAvtaleId(AktivitetsplanId(it.key()));
+                val hendelseMelding = if (avtaleId != null) database.hentEntitet(avtaleId) else null;
                 // Log error om det er en melding vi har sendt
                 if (!hendelseMelding.isNullOrEmpty()) {
                     log.error("Feil fra aktivitetsplan for avtale ${avtaleId}. Feilmelding: ${melding.errorMessage}");
