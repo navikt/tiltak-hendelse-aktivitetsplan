@@ -1,4 +1,5 @@
 *
 !src/main/resources/schema.yml
 !src/main/resources/schema-kassering.yml
+!src/main/resources/application.conf
 !target/tiltak-hendelse-aktivitetsplan*jar

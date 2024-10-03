@@ -64,7 +64,7 @@ class AppTest {
             val aktivitetsplanFeilConsumer = FeilConsumer(feilConsumer, database)
 
             val scope = CoroutineScope(Dispatchers.Default)
-            val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer)
+            val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer, database)
             Server.createWebServer().start()
 
             val result = withTimeoutOrNull(10000) { // Timeout etter (10 sekunder)

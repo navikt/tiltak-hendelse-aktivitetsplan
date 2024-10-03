@@ -125,6 +125,20 @@ class Database(val dataSource: HikariDataSource) {
         log.info("Lagret aktivitetsplanId i database")
     }
 
+    fun upsertAktivitetsplanId(avtaleId: AvtaleId, aktivitetsplanId: AktivitetsplanId) {
+        //language=postgresql
+        val query = """
+            insert into aktivitetsplan_id (avtale_id, aktivitetsplan_id) values (?, ?)
+            on conflict (avtale_id) do update set aktivitetsplan_id = excluded.aktivitetsplan_id
+        """.trimIndent()
+        using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf(query, avtaleId.value, aktivitetsplanId.value).asUpdate
+            )
+        }
+        log.info("Oppdatert aktivitetsplanId i database")
+    }
+
     fun hentAktivitetsplanId(avtaleId: AvtaleId): AktivitetsplanId? {
         //language=postgresql
         val query = "select aktivitetsplan_id from aktivitetsplan_id where avtale_id = ?"

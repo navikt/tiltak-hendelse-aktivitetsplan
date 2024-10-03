@@ -1,16 +1,18 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.*
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Attributt
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeSeksjon
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeType
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Oppgave
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.Cluster
 import java.net.URL
 import java.time.Instant
 import java.time.LocalDate
-import java.util.*
 
 data class AktivitetsKort(
     // Obligatoriske
-    @JsonSerialize(using = AktivitetsplanId::class)
+    @JsonSerialize(using = AktivitetsplanId.Serializer::class)
     val id: AktivitetsplanId,
     val personIdent: String,
     val startDato: LocalDate?,
@@ -69,26 +71,6 @@ data class AktivitetsKort(
             } else {
                 return if (side == "INTERN") URL(internDev) else URL(eksternDev)
             }
-        }
-
-        private fun lagOppgave(avtaleId: UUID): Oppgave {
-            val internAvtalePath =
-                if (Cluster.current == Cluster.PROD_GCP) "https://tiltaksgjennomforing.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.intern.nav.no/tiltaksgjennomforing/avtale/${avtaleId}"
-            val eksternAvtalePath =
-                if (Cluster.current == Cluster.PROD_GCP) "https://arbeidsgiver.nav.no/tiltaksgjennomforing/avtale/${avtaleId}" else "https://tiltaksgjennomforing.dev.nav.no/tiltaksgjennomforing/${avtaleId}"
-            val internOppgaveLenke = OppgaveLenke(
-                tekst = "Gå til avtalen",
-                subtekst = "Trykk her",
-                url = URL(internAvtalePath),
-                knapptekst = "Gå til avtalen"
-            )
-            val eksternOppgaveLenke = OppgaveLenke(
-                tekst = "Gå til avtalen",
-                subtekst = "Trykk her",
-                url = URL(eksternAvtalePath),
-                knapptekst = "Gå til avtalen"
-            )
-            return Oppgave(ekstern = eksternOppgaveLenke, intern = internOppgaveLenke)
         }
 
         private fun endretAvAktivitetsplanformat(utførtAv: String, utførtAvRolle: AvtaleHendelseUtførtAvRolle): Ident {
