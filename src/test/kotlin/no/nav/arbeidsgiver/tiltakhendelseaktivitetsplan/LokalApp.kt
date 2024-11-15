@@ -22,6 +22,7 @@ suspend fun main() {
     val aktivitetsplanFeilConsumer = FeilConsumer(consumer, database)
 
     val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer, database)
-    Server.createWebServer().start()
+    val server = Server.createWebServer().start()
+    println("\n H2 Started med status: ${server.status} \n")
     app.start()
 }
