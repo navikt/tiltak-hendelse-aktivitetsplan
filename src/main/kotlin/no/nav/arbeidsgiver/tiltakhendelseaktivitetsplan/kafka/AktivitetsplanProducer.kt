@@ -12,7 +12,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.producer.Producer
 import org.apache.kafka.clients.producer.ProducerRecord
-import java.util.UUID
+import java.util.*
 
 private const val AKTIVITETSPLAN_TOPIC = "dab.aktivitetskort-v1.1"
 
@@ -51,7 +51,6 @@ class AktivitetsplanProducer(
             output.errors?.forEach {
                 log.error("${it.error} - ${it.instanceLocation}")
             }
-            log.error("")
             return
         }
 
@@ -90,7 +89,6 @@ class AktivitetsplanProducer(
             output.errors?.forEach {
                 log.error("${it.error} - ${it.instanceLocation}")
             }
-            log.error("")
             return
         }
 
