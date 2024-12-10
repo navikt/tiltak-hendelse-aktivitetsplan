@@ -15,7 +15,7 @@ data class AvtaleHendelseMelding(
     val bedriftNavn: String?,
     val bedriftNr: String,
     val stillingstittel: String?,
-    val stillingprosent: Int?,
+    val stillingprosent: Double?,
     val avtaleInngått: LocalDateTime?,
     val utførtAv: String,
     val utførtAvRolle: AvtaleHendelseUtførtAvRolle,
@@ -26,5 +26,5 @@ data class AvtaleHendelseMelding(
     val sistEndret: Instant,
     val veilederNavIdent: String?,
     val annullertGrunn: String?,
-    val antallDagerPerUke: Int?
+    val antallDagerPerUke: Double?
 )
