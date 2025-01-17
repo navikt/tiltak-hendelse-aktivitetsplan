@@ -7,7 +7,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import net.pwall.json.schema.JSONSchema
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.*
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Attributt
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeSeksjon
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeType
 import org.junit.jupiter.api.Test
 import java.net.URL
 import java.time.Instant
@@ -112,7 +114,8 @@ class MappingTest {
             "        \"godkjentPaVegneAvArbeidsgiver\": false,\n" +
             "        \"innholdType\": \"ENDRE_STILLING\",\n" +
             "        \"utførtAv\": \"Z123456\",\n" +
-            "        \"utførtAvRolle\": \"VEILEDER\"\n" +
+            "        \"utførtAvRolle\": \"VEILEDER\",\n" +
+            "        \"opphav\": \"VEILEDER\"\n" +
             "    }"
 
     @Test

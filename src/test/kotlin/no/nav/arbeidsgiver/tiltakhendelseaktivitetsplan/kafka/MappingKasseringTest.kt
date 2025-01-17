@@ -107,7 +107,8 @@ class MappingKasseringTest {
             "        \"godkjentPaVegneAvArbeidsgiver\": false,\n" +
             "        \"innholdType\": \"ENDRE_STILLING\",\n" +
             "        \"utførtAv\": \"Z123456\",\n" +
-            "        \"utførtAvRolle\": \"VEILEDER\"\n" +
+            "        \"utførtAvRolle\": \"VEILEDER\",\n" +
+            "        \"opphav\": \"VEILEDER\"\n" +
             "    }"
 
     @Test

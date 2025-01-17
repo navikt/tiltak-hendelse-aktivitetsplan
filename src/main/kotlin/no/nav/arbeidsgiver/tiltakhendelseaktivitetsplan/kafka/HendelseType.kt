@@ -3,19 +3,22 @@ package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 enum class HendelseType(val tekst: String, val skalTilAktivitetsplan: Boolean) {
 
     // Skal med
+    ANNULLERT("Avtale annullert", true),
     AVTALE_FORKORTET("Avtale forkortet", true),
+    AVTALE_FORKORTET_AV_ARENA("Avtale forkortet av Arena", true),
     AVTALE_FORLENGET("Avtale forlenget av veileder", true),
+    AVTALE_FORLENGET_AV_ARENA("Avtale forlenget av Arena", true),
     AVTALE_INNGÅTT("Avtale godkjent av NAV", true),
     ENDRET("Avtale endret", true),
+    ENDRET_AV_ARENA("Avtale endret av Arena", true),
     GODKJENT_AV_VEILEDER("Avtale er godkjent av veileder", true),
     OPPRETTET("Avtale er opprettet av veileder", true),
+    OPPRETTET_AV_ARENA("Avtale opprettet fra Arena", true),
     OPPRETTET_AV_ARBEIDSGIVER("Avtale er opprettet av arbeidsgiver", true),
-    OPPRETTET_AV_ARENA("Avtale opprettet fra Arena", false),
     STATUSENDRING("Statusendring", true),
     STILLINGSBESKRIVELSE_ENDRET("Stillingsbeskrivelse endret av veileder" , true),
 
     // Skal ikke med
-    ANNULLERT("Avtale annullert av veileder", true),
     ARBEIDSGIVERS_GODKJENNING_OPPHEVET_AV_VEILEDER("Arbeidsgivers godkjenning opphevet av veileder", false),
     AVBRUTT("Avtale avbrutt av veileder", false),
     AVTALE_FORDELT("Avtale tildelt veileder", false),
