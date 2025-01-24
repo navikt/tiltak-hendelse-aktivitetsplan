@@ -42,6 +42,7 @@ definitions:
       - MIDLERTIDIG_LONNSTILSKUDD
       - VARIG_LONNSTILSKUDD
       - ARENA_TILTAK
+      - ARBEIDSTRENING
     description: Aktivitetskort typer som er tillatt å opprette via tjenesten. Denne enumereringen vil utvides etterhvert.
   oppgave:
     additionalProperties: false
