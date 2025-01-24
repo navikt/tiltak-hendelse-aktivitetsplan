@@ -41,7 +41,7 @@ data class AktivitetsKort(
                 aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
                 endretTidspunkt = melding.sistEndret,
-                avtaltMedNav = melding.veilederNavIdent != null,
+                avtaltMedNav = if (melding.opphav == AvtaleOpphav.ARENA) true else melding.veilederNavIdent != null,
                 oppgave = null,
                 handlinger = listOf(
                     LenkeSeksjon("Gå til avtalen", "", lenke("INTERN", melding.avtaleId), LenkeType.INTERN),
