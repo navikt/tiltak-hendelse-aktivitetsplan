@@ -2,6 +2,7 @@ package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka
 
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import java.math.BigDecimal
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -15,7 +16,7 @@ data class AvtaleHendelseMelding(
     val bedriftNavn: String?,
     val bedriftNr: String,
     val stillingstittel: String?,
-    val stillingprosent: Int?,
+    val stillingprosent: BigDecimal?,
     val avtaleInngått: LocalDateTime?,
     val utførtAv: String,
     val utførtAvRolle: AvtaleHendelseUtførtAvRolle,
@@ -26,6 +27,6 @@ data class AvtaleHendelseMelding(
     val sistEndret: Instant,
     val veilederNavIdent: String?,
     val annullertGrunn: String?,
-    val antallDagerPerUke: Int?,
+    val antallDagerPerUke: BigDecimal?,
     val opphav: AvtaleOpphav
 )
