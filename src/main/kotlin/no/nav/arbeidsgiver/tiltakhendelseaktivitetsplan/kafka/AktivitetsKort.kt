@@ -36,7 +36,7 @@ data class AktivitetsKort(
                 personIdent = melding.deltakerFnr,
                 startDato = melding.startDato,
                 sluttDato = melding.sluttDato,
-                tittel = "Avtale om ${melding.tiltakstype.beskrivelse}",
+                tittel = formaterTittel(melding.tiltakstype, melding.stillingstittel, melding.bedriftNavn),
                 //  beskrivelse = "Dette er en beskrivelse",
                 aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
                 endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
@@ -54,6 +54,14 @@ data class AktivitetsKort(
                     lagAttributt(label = "Antall dager per uke", verdi = melding.antallDagerPerUke?.toString())
                 )
             )
+        }
+
+        private fun formaterTittel(tiltakstype: Tiltakstype, stillingstittel: String?, bedriftNavn: String?): String {
+            if (stillingstittel.isNullOrBlank() || bedriftNavn.isNullOrBlank()) {
+                return "Avtale om ${tiltakstype.beskrivelse}"
+            }
+
+            return "$stillingstittel hos $bedriftNavn"
         }
 
         private fun lagAttributt(label: String, verdi: String?): Attributt {
