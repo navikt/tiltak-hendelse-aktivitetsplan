@@ -15,6 +15,7 @@ enum class HendelseType(val tekst: String, val skalTilAktivitetsplan: Boolean) {
     OPPRETTET("Avtale er opprettet av veileder", true),
     OPPRETTET_AV_ARENA("Avtale opprettet fra Arena", true),
     OPPRETTET_AV_ARBEIDSGIVER("Avtale er opprettet av arbeidsgiver", true),
+    PATCH("Rette opp feil fra tidligere avtalemelding" , true),
     STATUSENDRING("Statusendring", true),
     STILLINGSBESKRIVELSE_ENDRET("Stillingsbeskrivelse endret av veileder" , true),
 
