@@ -38,8 +38,8 @@ data class AktivitetsKort(
                 sluttDato = melding.sluttDato,
                 tittel = formaterTittel(melding.tiltakstype, melding.stillingstittel, melding.bedriftNavn),
                 //  beskrivelse = "Dette er en beskrivelse",
-                aktivitetStatus = aktivitetStatusFraAvtaleStatus(melding.avtaleStatus),
-                endretAv = endretAvAktivitetsplanformat(melding.utførtAv, melding.utførtAvRolle),
+                aktivitetStatus = AktivitetStatus.parse(melding.avtaleStatus),
+                endretAv = Ident(melding.utførtAv, IdentType.parse(melding.utførtAvRolle)),
                 endretTidspunkt = melding.sistEndret,
                 avtaltMedNav = if (melding.opphav == AvtaleOpphav.ARENA) true else melding.veilederNavIdent != null,
                 oppgave = null,
@@ -80,31 +80,5 @@ data class AktivitetsKort(
                 return if (side == "INTERN") URL(internDev) else URL(eksternDev)
             }
         }
-
-        private fun endretAvAktivitetsplanformat(utførtAv: String, utførtAvRolle: AvtaleHendelseUtførtAvRolle): Ident {
-            val identType = when(utførtAvRolle) {
-                AvtaleHendelseUtførtAvRolle.VEILEDER -> IdentType.NAVIDENT
-                AvtaleHendelseUtførtAvRolle.BESLUTTER -> IdentType.NAVIDENT
-                AvtaleHendelseUtførtAvRolle.ARBEIDSGIVER -> IdentType.ARBEIDSGIVER
-                AvtaleHendelseUtførtAvRolle.MENTOR -> IdentType.ARBEIDSGIVER
-                AvtaleHendelseUtførtAvRolle.SYSTEM -> IdentType.SYSTEM
-                AvtaleHendelseUtførtAvRolle.DELTAKER -> IdentType.PERSONBRUKER
-            }
-
-            return Ident(utførtAv, identType)
-        }
-
-        private fun aktivitetStatusFraAvtaleStatus(avtaleStatus: AvtaleStatus): AktivitetStatus {
-            return when (avtaleStatus) {
-                AvtaleStatus.PÅBEGYNT -> AktivitetStatus.PLANLAGT
-                AvtaleStatus.MANGLER_GODKJENNING -> AktivitetStatus.PLANLAGT
-                AvtaleStatus.KLAR_FOR_OPPSTART -> AktivitetStatus.PLANLAGT
-                AvtaleStatus.GJENNOMFØRES -> AktivitetStatus.GJENNOMFORES
-                AvtaleStatus.AVSLUTTET -> AktivitetStatus.FULLFORT
-                AvtaleStatus.ANNULLERT -> AktivitetStatus.AVBRUTT
-                AvtaleStatus.AVBRUTT -> AktivitetStatus.AVBRUTT
-            }
-        }
-
     }
 }
