@@ -36,7 +36,7 @@ class AktivitetsplanProducer(
             UUID.randomUUID(),
             "TEAM_TILTAK",
             "UPSERT_AKTIVITETSKORT_V1",
-            melding.tiltakstype, // må sjekke
+            AktivitetTiltakstype.parse(melding.tiltakstype),
             aktivitetsKort)
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
 

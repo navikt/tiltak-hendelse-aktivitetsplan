@@ -41,8 +41,8 @@ definitions:
     enum:
       - MIDLERTIDIG_LONNSTILSKUDD
       - VARIG_LONNSTILSKUDD
-      - ARENA_TILTAK
       - ARBEIDSTRENING
+      - VARIG_TILRETTELAGT_ARBEID_I_ORDINAER_VIRKSOMHET
     description: Aktivitetskort typer som er tillatt å opprette via tjenesten. Denne enumereringen vil utvides etterhvert.
   oppgave:
     additionalProperties: false
