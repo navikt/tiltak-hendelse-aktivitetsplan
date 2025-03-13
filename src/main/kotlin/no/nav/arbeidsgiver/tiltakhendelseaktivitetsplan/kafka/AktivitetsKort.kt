@@ -39,7 +39,7 @@ data class AktivitetsKort(
                 tittel = formaterTittel(melding.tiltakstype, melding.stillingstittel, melding.bedriftNavn),
                 //  beskrivelse = "Dette er en beskrivelse",
                 aktivitetStatus = AktivitetStatus.parse(melding.avtaleStatus),
-                endretAv = Ident(melding.utførtAv, IdentType.parse(melding.utførtAvRolle)),
+                endretAv = Ident.fra(melding),
                 endretTidspunkt = melding.sistEndret,
                 avtaltMedNav = if (melding.opphav == AvtaleOpphav.ARENA) true else melding.veilederNavIdent != null,
                 oppgave = null,
