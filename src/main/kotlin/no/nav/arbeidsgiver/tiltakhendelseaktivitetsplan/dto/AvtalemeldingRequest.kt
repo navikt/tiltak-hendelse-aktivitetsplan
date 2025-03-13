@@ -9,4 +9,5 @@ data class AvtalemeldingRequest(
     val avtaleId: AvtaleId,
     @JsonDeserialize(using = AktivitetsplanId.Deserializer::class)
     val aktivitetsplanId: AktivitetsplanId,
+    val resendSisteMelding: Boolean = false,
 )

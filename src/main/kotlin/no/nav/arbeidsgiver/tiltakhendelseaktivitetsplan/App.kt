@@ -60,6 +60,19 @@ class App(
                             avtalemeldingRequest.aktivitetsplanId,
                         )
 
+                        if (avtalemeldingRequest.resendSisteMelding) {
+                            database.hentEntitet(avtalemeldingRequest.avtaleId)
+                                .filter { it.sendt }
+                                .maxByOrNull { it.opprettetTidspunkt }
+                                ?.let {
+                                    logger.info(
+                                        "Sender sist melding med id ${it.id} " +
+                                        "på ny for avtale ${avtalemeldingRequest.avtaleId}"
+                                    )
+                                    avtaleHendelseConsumer.kallProducer(it)
+                                }
+                        }
+
                         call.respond(HttpStatusCode.NoContent)
                     } catch (ex: Exception) {
                         log.error("Feil ved oppdatering av avtale", ex)
