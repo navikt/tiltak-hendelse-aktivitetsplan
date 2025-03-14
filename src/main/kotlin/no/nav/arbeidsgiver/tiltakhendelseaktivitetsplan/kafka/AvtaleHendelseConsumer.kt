@@ -58,11 +58,6 @@ class AvtaleHendelseConsumer(
                     consumer.commitAsync()
                     return@forEach
                 }
-                if (!melding.tiltakstype.skalTilAktivitetsplan) {
-                    log.info("melding med tiltakstype ${melding.tiltakstype} skal ikke til aktivitetsplan")
-                    consumer.commitAsync()
-                    return@forEach
-                }
 
                 val aktivitetsplanMeldingEntitet = AktivitetsplanMeldingEntitet(
                     id = UUID.randomUUID(),
@@ -80,29 +75,27 @@ class AvtaleHendelseConsumer(
                 database.lagreAktivitetsplanId(melding.avtaleId, AktivitetsplanId.fromAvtaleId(melding.avtaleId))
 
                 consumer.commitAsync()
-                // kjør en asynkron co-routine
-                if (melding.annullertGrunn.equals("Feilregistrering")) {
-                    val job = kallProducerForKassering(aktivitetsplanMeldingEntitet)
-                    log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
-                } else {
-                    val job = kallProducer(aktivitetsplanMeldingEntitet)
-                    log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
-                }
+                kallProducer(aktivitetsplanMeldingEntitet)
             }
         }
     }
 
-    suspend fun kallProducer(melding: AktivitetsplanMeldingEntitet) = coroutineScope {
-        launch {
-            log.info("Launcher produsent for å sende melding til aktivitsplan")
-            aktivitetsplanProducer.sendMelding(melding)
-        }
-    }
+    suspend fun kallProducer(aktivitetsplanMeldingEntitet: AktivitetsplanMeldingEntitet) = coroutineScope {
+        val avtaleHendelseMelding: AvtaleHendelseMelding = mapper.readValue(aktivitetsplanMeldingEntitet.mottattJson)
 
-    suspend fun kallProducerForKassering(melding: AktivitetsplanMeldingEntitet) = coroutineScope {
-        launch {
-            log.info("Launcher produsent for å sende kasseringsmelding til aktivitsplan")
-            aktivitetsplanProducer.sendKasserMelding(melding)
+        // kjør en asynkron co-routine
+        if (avtaleHendelseMelding.annullertGrunn.equals("Feilregistrering")) {
+            val job = launch {
+                log.info("Launcher produsent for å sende kasseringsmelding til aktivitsplan")
+                aktivitetsplanProducer.sendKasserMelding(aktivitetsplanMeldingEntitet)
+            }
+            log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
+        } else {
+            val job = launch {
+                log.info("Launcher produsent for å sende melding til aktivitsplan")
+                aktivitetsplanProducer.sendMelding(aktivitetsplanMeldingEntitet)
+            }
+            log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
         }
     }
 }
