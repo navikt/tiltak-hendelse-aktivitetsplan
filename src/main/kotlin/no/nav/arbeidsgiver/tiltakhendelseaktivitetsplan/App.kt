@@ -16,6 +16,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import net.pwall.json.schema.JSONSchema
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.dto.AvtalemeldingRequest
@@ -27,6 +28,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
 import java.io.Closeable
+import java.util.*
 
 class App(
     private val avtaleHendelseConsumer: AvtaleHendelseConsumer,
@@ -66,10 +68,11 @@ class App(
                                 .maxByOrNull { it.opprettetTidspunkt }
                                 ?.let {
                                     logger.info(
-                                        "Sender sist melding med id ${it.id} " +
-                                        "på ny for avtale ${avtalemeldingRequest.avtaleId}"
+                                        "Sender melding ${it.id} på ny for avtale ${avtalemeldingRequest.avtaleId}"
                                     )
-                                    avtaleHendelseConsumer.kallProducer(it)
+                                    avtaleHendelseConsumer.kallProducer(
+                                        AktivitetsplanMeldingEntitet.fra(UUID.randomUUID(), it)
+                                    )
                                 }
                         }
 

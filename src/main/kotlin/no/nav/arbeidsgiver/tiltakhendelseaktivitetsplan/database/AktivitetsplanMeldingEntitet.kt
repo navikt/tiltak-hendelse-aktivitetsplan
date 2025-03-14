@@ -18,7 +18,24 @@ data class AktivitetsplanMeldingEntitet(
     val sendt: Boolean,
     val topicOffset: Long,
     val producerTopicOffset: Long?
-)
+) {
+    companion object {
+        fun fra(id: UUID, aktivitetsplanMeldingEntitet: AktivitetsplanMeldingEntitet): AktivitetsplanMeldingEntitet {
+            return AktivitetsplanMeldingEntitet(
+                id,
+                aktivitetsplanMeldingEntitet.avtaleId,
+                aktivitetsplanMeldingEntitet.avtaleStatus,
+                aktivitetsplanMeldingEntitet.opprettetTidspunkt,
+                aktivitetsplanMeldingEntitet.hendelseType,
+                aktivitetsplanMeldingEntitet.mottattJson,
+                aktivitetsplanMeldingEntitet.sendingJson,
+                aktivitetsplanMeldingEntitet.sendt,
+                aktivitetsplanMeldingEntitet.topicOffset,
+                aktivitetsplanMeldingEntitet.producerTopicOffset
+            )
+        }
+    }
+}
 
 val tilAktivitetsplanMeldingEntitet: (Row) -> AktivitetsplanMeldingEntitet = { row ->
     AktivitetsplanMeldingEntitet(
