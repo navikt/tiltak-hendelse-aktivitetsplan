@@ -153,7 +153,7 @@ class Database(val dataSource: HikariDataSource) {
 
     fun hentAvtaleId(aktivitetsplanId: AktivitetsplanId): AvtaleId? {
         //language=postgresql
-        val query = "select avtale_id from aktivitetsplan_id where avtale_id = ?"
+        val query = "select avtale_id from aktivitetsplan_id where aktivitetsplan_id = ?"
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf(query, aktivitetsplanId.value)
