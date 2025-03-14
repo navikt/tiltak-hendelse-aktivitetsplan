@@ -26,7 +26,11 @@ class FeilConsumer(
             records.isEmpty && continue
             records.forEach {
                 val melding: AktivitetsPlanFeilMelding = mapper.readValue(it.value())
-                val avtaleId = database.hentAvtaleId(AktivitetsplanId(it.key()));
+                val avtaleId = try {
+                    database.hentAvtaleId(AktivitetsplanId(it.key()))
+                } catch (e: Exception) {
+                    AvtaleId(it.key())
+                }
                 val hendelseMelding = if (avtaleId != null) database.hentEntitet(avtaleId) else null;
                 // Log error om det er en melding vi har sendt
                 if (!hendelseMelding.isNullOrEmpty()) {
