@@ -11,7 +11,6 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanM
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.testDataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.*
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
@@ -21,8 +20,8 @@ import org.junit.jupiter.api.Disabled
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
 import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.*
-import kotlin.math.log
 import kotlin.test.Test
 import kotlin.test.assertNotEquals
 
@@ -206,7 +205,7 @@ class AppTest {
 
     fun enFeilMeldingFraTeamDab_aktivitetsplan():String{
        return mapper.writeValueAsString(AktivitetsPlanFeilMelding(
-            timestamp = LocalDateTime.now(),
+            timestamp = ZonedDateTime.now(),
             failingMessage = "Failing message",
             errorMessage = "Error message"
         ))
