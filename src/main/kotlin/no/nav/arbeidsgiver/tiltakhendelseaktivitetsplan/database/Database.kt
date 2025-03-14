@@ -157,7 +157,7 @@ class Database(val dataSource: HikariDataSource) {
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf(query, aktivitetsplanId.value)
-                    .map{ AvtaleId(it.string("aktivitetsplan_id")) }
+                    .map{ AvtaleId(it.string("avtale_id")) }
                     .asSingle
             )
         }
