@@ -75,14 +75,17 @@ class AvtaleHendelseConsumer(
                 database.lagreAktivitetsplanId(melding.avtaleId, AktivitetsplanId.fromAvtaleId(melding.avtaleId))
 
                 consumer.commitAsync()
-                kallProducer(aktivitetsplanMeldingEntitet)
+                kallProducer(aktivitetsplanMeldingEntitet, melding)
             }
         }
     }
 
     suspend fun kallProducer(aktivitetsplanMeldingEntitet: AktivitetsplanMeldingEntitet) = coroutineScope {
         val avtaleHendelseMelding: AvtaleHendelseMelding = mapper.readValue(aktivitetsplanMeldingEntitet.mottattJson)
+        kallProducer(aktivitetsplanMeldingEntitet, avtaleHendelseMelding)
+    }
 
+    suspend fun kallProducer(aktivitetsplanMeldingEntitet: AktivitetsplanMeldingEntitet, avtaleHendelseMelding: AvtaleHendelseMelding) = coroutineScope {
         // kjør en asynkron co-routine
         if (avtaleHendelseMelding.annullertGrunn.equals("Feilregistrering")) {
             val job = launch {
