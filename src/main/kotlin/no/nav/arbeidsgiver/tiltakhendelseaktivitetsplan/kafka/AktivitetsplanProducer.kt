@@ -37,7 +37,8 @@ class AktivitetsplanProducer(
             "TEAM_TILTAK",
             "UPSERT_AKTIVITETSKORT_V1",
             AktivitetTiltakstype.parse(melding.tiltakstype),
-            aktivitetsKort)
+            aktivitetsKort
+        )
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
 
         log.info(
@@ -46,7 +47,7 @@ class AktivitetsplanProducer(
             aktivitetsplanId
         )
 
-        if (!schema.validate(meldingJson))  {
+        if (!schema.validate(meldingJson)) {
             val output = schema.validateBasic(meldingJson)
             output.errors?.forEach {
                 log.error("${it.error} - ${it.instanceLocation}")
@@ -63,9 +64,10 @@ class AktivitetsplanProducer(
                     // Oppdatere sendt til true
                     database.settEntitetTilSendt(entitet.id, recordMetadata.offset())
                 }
+
                 else -> {
-                    log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-                    database.settFeilmeldingPåEntitet(entitet.id, "feilmeldingen her")
+                    log.error("Kunne ikke sende melding til aktivitetsplan", exception)
+                    database.settFeilmeldingPåEntitet(entitet.id, exception.message ?: "")
                 }
             }
         }
@@ -84,7 +86,7 @@ class AktivitetsplanProducer(
             aktivitetsplanId
         )
 
-        if(!kasseringSchema.validate(meldingJson))  {
+        if (!kasseringSchema.validate(meldingJson)) {
             val output = kasseringSchema.validateBasic(meldingJson)
             output.errors?.forEach {
                 log.error("${it.error} - ${it.instanceLocation}")
@@ -101,9 +103,10 @@ class AktivitetsplanProducer(
                     // Oppdatere sendt til true
                     database.settEntitetTilSendt(entitet.id, recordMetadata.offset())
                 }
+
                 else -> {
-                    log.error("Kunne ikke sende melding til aktivitetsplan ${exception.stackTrace}")
-                    database.settFeilmeldingPåEntitet(entitet.id, "feilmeldingen her")
+                    log.error("Kunne ikke sende melding til aktivitetsplan", exception)
+                    database.settFeilmeldingPåEntitet(entitet.id, exception.message ?: "")
                 }
             }
         }
