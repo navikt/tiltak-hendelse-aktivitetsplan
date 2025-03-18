@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
@@ -21,7 +19,7 @@ class AvtaleHendelseConsumer(
     private val consumer: Consumer<String, String>,
     private val aktivitetsplanProducer: AktivitetsplanProducer,
     private val database: Database
-    ) {
+) {
     val mapper = jacksonObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .registerModule(JavaTimeModule())
@@ -34,7 +32,7 @@ class AvtaleHendelseConsumer(
             records.isEmpty && continue
             records.forEach {
                 val melding: AvtaleHendelseMelding = try {
-                     mapper.readValue(it.value())
+                    mapper.readValue(it.value())
                 } catch (e: Exception) {
                     // lagre i database med feilstatus
                     log.error("Meldingen med avtaleId (record key) ${it.key()} kunne ikke parses")
@@ -80,25 +78,16 @@ class AvtaleHendelseConsumer(
         }
     }
 
-    suspend fun kallProducer(aktivitetsplanMeldingEntitet: AktivitetsplanMeldingEntitet) = coroutineScope {
+    fun kallProducer(aktivitetsplanMeldingEntitet: AktivitetsplanMeldingEntitet) {
         val avtaleHendelseMelding: AvtaleHendelseMelding = mapper.readValue(aktivitetsplanMeldingEntitet.mottattJson)
         kallProducer(aktivitetsplanMeldingEntitet, avtaleHendelseMelding)
     }
 
-    suspend fun kallProducer(aktivitetsplanMeldingEntitet: AktivitetsplanMeldingEntitet, avtaleHendelseMelding: AvtaleHendelseMelding) = coroutineScope {
-        // kjør en asynkron co-routine
+    fun kallProducer(aktivitetsplanMeldingEntitet: AktivitetsplanMeldingEntitet, avtaleHendelseMelding: AvtaleHendelseMelding) {
         if (avtaleHendelseMelding.annullertGrunn.equals("Feilregistrering")) {
-            val job = launch {
-                log.info("Launcher produsent for å sende kasseringsmelding til aktivitsplan")
-                aktivitetsplanProducer.sendKasserMelding(aktivitetsplanMeldingEntitet)
-            }
-            log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
+            aktivitetsplanProducer.sendKasserMelding(aktivitetsplanMeldingEntitet)
         } else {
-            val job = launch {
-                log.info("Launcher produsent for å sende melding til aktivitsplan")
-                aktivitetsplanProducer.sendMelding(aktivitetsplanMeldingEntitet)
-            }
-            log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
+            aktivitetsplanProducer.sendMelding(aktivitetsplanMeldingEntitet)
         }
     }
 }
