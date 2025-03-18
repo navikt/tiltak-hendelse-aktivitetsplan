@@ -106,7 +106,7 @@ class App(
         server.start()
         coroutineScope {
             launch { avtaleHendelseConsumer.start() }
-            launch { aktivitetsplanFeilConsumer.start() }
+            //launch { aktivitetsplanFeilConsumer.start() }
         }
     }
 
