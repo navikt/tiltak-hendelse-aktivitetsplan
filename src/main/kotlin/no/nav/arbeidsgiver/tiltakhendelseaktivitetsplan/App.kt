@@ -24,7 +24,13 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanM
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.dto.AvtalemeldingRequest
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.*
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProducer
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseConsumer
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseMelding
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.FeilConsumer
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.consumerConfig
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.feilConsumerConfig
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.producerConfig
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import no.nav.security.token.support.v2.tokenValidationSupport
 import org.apache.kafka.clients.consumer.Consumer
@@ -79,11 +85,9 @@ class App(
                                     )
                                     val melding: AvtaleHendelseMelding = mapper.readValue(it.mottattJson)
                                     if (melding.annullertGrunn.equals("Feilregistrering")) {
-                                        val job = avtaleHendelseConsumer.kallProducerForKassering(it)
-                                        log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
+                                        avtaleHendelseConsumer.kallProducerForKassering(it)
                                     } else {
-                                        val job = avtaleHendelseConsumer.kallProducer(it)
-                                        log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
+                                        avtaleHendelseConsumer.kallProducer(it)
                                     }
                                     avtaleHendelseConsumer.kallProducer(
                                         AktivitetsplanMeldingEntitet.fra(UUID.randomUUID(), it)

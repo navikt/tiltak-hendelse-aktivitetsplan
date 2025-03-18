@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.yield
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import org.apache.kafka.clients.consumer.Consumer
@@ -15,7 +15,7 @@ class FeilConsumer(
     private val consumer: Consumer<String, String>,
     private val database: Database
 ) {
-    fun start() = runBlocking {
+    suspend fun start() {
         log.info("Starter konsumering på topic: ${Topics.AKTIVITETSPLAN_FEIL}")
         val mapper = jacksonObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -39,6 +39,7 @@ class FeilConsumer(
                 }
             }
             consumer.commitAsync()
+            yield()
         }
     }
 }

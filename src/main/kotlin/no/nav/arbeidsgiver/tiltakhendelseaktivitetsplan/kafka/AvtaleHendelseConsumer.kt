@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.yield
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.HendelseMeldingFeiletEntitet
@@ -26,7 +24,7 @@ class AvtaleHendelseConsumer(
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .registerModule(JavaTimeModule())
 
-    fun start() = runBlocking {
+    suspend fun start() {
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
         while (true) {
@@ -76,29 +74,21 @@ class AvtaleHendelseConsumer(
                 database.lagreAktivitetsplanId(melding.avtaleId, AktivitetsplanId.fromAvtaleId(melding.avtaleId))
 
                 consumer.commitAsync()
-                // kjør en asynkron co-routine
                 if (melding.annullertGrunn.equals("Feilregistrering")) {
-                    val job = kallProducerForKassering(aktivitetsplanMeldingEntitet)
-                    log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
+                    kallProducerForKassering(aktivitetsplanMeldingEntitet)
                 } else {
-                    val job = kallProducer(aktivitetsplanMeldingEntitet)
-                    log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
+                    kallProducer(aktivitetsplanMeldingEntitet)
                 }
             }
+            yield()
         }
     }
 
-    suspend fun kallProducer(melding: AktivitetsplanMeldingEntitet) = coroutineScope {
-        launch {
-            log.info("Launcher produsent for å sende melding til aktivitsplan")
-            aktivitetsplanProducer.sendMelding(melding)
-        }
+    fun kallProducer(melding: AktivitetsplanMeldingEntitet) {
+        aktivitetsplanProducer.sendMelding(melding)
     }
 
-    suspend fun kallProducerForKassering(melding: AktivitetsplanMeldingEntitet) = coroutineScope {
-        launch {
-            log.info("Launcher produsent for å sende kasseringsmelding til aktivitsplan")
-            aktivitetsplanProducer.sendKasserMelding(melding)
-        }
+    fun kallProducerForKassering(melding: AktivitetsplanMeldingEntitet) {
+        aktivitetsplanProducer.sendKasserMelding(melding)
     }
 }
