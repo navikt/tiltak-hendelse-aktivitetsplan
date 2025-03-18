@@ -22,6 +22,7 @@ class FeilConsumer(
             .registerModule(JavaTimeModule())
         consumer.subscribe(listOf(Topics.AKTIVITETSPLAN_FEIL))
         while (true) {
+            log.info("Poller feilmeldinger fra aktivitetsplan...")
             val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(5))
             records.isEmpty && continue
             records.forEach {

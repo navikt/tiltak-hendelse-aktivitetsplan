@@ -30,6 +30,7 @@ class AvtaleHendelseConsumer(
         log.info("Starter konsumering på topic: ${Topics.AVTALE_HENDELSE}")
         consumer.subscribe(listOf(Topics.AVTALE_HENDELSE))
         while (true) {
+            log.info("Poller avtalehendelse-meldinger...")
             val records: ConsumerRecords<String, String> = consumer.poll(Duration.ofSeconds(5))
             records.isEmpty && continue
             records.forEach {
