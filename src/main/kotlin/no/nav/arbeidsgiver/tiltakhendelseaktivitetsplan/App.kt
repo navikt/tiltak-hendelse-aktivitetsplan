@@ -1,5 +1,9 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan
 
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.jose.util.DefaultResourceRetriever
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
@@ -20,12 +24,7 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanM
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.dto.AvtalemeldingRequest
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProducer
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseConsumer
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.FeilConsumer
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.consumerConfig
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.feilConsumerConfig
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.producerConfig
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.*
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import no.nav.security.token.support.v2.tokenValidationSupport
 import org.apache.kafka.clients.consumer.Consumer
@@ -41,6 +40,9 @@ class App(
     private val database: Database
 ) : Closeable {
     private val logger = KotlinLogging.logger {}
+    private val mapper = jacksonObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .registerModule(JavaTimeModule())
     private val server = embeddedServer(Netty, port = 8080) {
         install(ContentNegotiation) {
             jackson {}
@@ -75,6 +77,14 @@ class App(
                                     logger.info(
                                         "Sender melding ${it.id} på ny for avtale ${avtalemeldingRequest.avtaleId}"
                                     )
+                                    val melding: AvtaleHendelseMelding = mapper.readValue(it.mottattJson)
+                                    if (melding.annullertGrunn.equals("Feilregistrering")) {
+                                        val job = avtaleHendelseConsumer.kallProducerForKassering(it)
+                                        log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
+                                    } else {
+                                        val job = avtaleHendelseConsumer.kallProducer(it)
+                                        log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
+                                    }
                                     avtaleHendelseConsumer.kallProducer(
                                         AktivitetsplanMeldingEntitet.fra(UUID.randomUUID(), it)
                                     )
