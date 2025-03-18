@@ -20,7 +20,12 @@ import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanM
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.dto.AvtalemeldingRequest
-import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.*
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AktivitetsplanProducer
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleHendelseConsumer
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.FeilConsumer
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.consumerConfig
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.feilConsumerConfig
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.producerConfig
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.utils.log
 import no.nav.security.token.support.v2.tokenValidationSupport
 import org.apache.kafka.clients.consumer.Consumer
@@ -100,17 +105,24 @@ class App(
         server.stop(0, 0)
     }
 }
-suspend fun main() {
-    val schema = JSONSchema.parseFile("schema.yml")
-    val kasseringSchema = JSONSchema.parseFile("schema-kassering.yml")
-    // Setup kafka and database
-    val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
-    val feilConsumer: Consumer<String, String> = KafkaConsumer(feilConsumerConfig())
-    val producer: Producer<String, String> = KafkaProducer(producerConfig())
-    val database = Database(dataSource)
-    val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema, kasseringSchema)
-    val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
-    val aktivitetsplanFeilConsumer = FeilConsumer(feilConsumer, database)
 
-    App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer, database).start()
+suspend fun main() {
+    val logger = KotlinLogging.logger {}
+    try {
+        val schema = JSONSchema.parseFile("schema.yml")
+        val kasseringSchema = JSONSchema.parseFile("schema-kassering.yml")
+        // Setup kafka and database
+        val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
+        val feilConsumer: Consumer<String, String> = KafkaConsumer(feilConsumerConfig())
+        val producer: Producer<String, String> = KafkaProducer(producerConfig())
+        val database = Database(dataSource)
+        val aktivitetsplanProducer = AktivitetsplanProducer(producer, database, schema, kasseringSchema)
+        val avtaleHendelseConsumer = AvtaleHendelseConsumer(consumer, aktivitetsplanProducer, database)
+        val aktivitetsplanFeilConsumer = FeilConsumer(feilConsumer, database)
+
+        App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer, database).start()
+    } catch (e: Exception) {
+        logger.error(e.message, e)
+        throw e
+    }
 }
