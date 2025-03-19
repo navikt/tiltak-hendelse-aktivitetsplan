@@ -3,7 +3,6 @@ package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.nimbusds.jose.util.DefaultResourceRetriever
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
@@ -77,14 +76,6 @@ class App(
                                     logger.info(
                                         "Sender melding ${it.id} på ny for avtale ${avtalemeldingRequest.avtaleId}"
                                     )
-                                    val melding: AvtaleHendelseMelding = mapper.readValue(it.mottattJson)
-                                    if (melding.annullertGrunn.equals("Feilregistrering")) {
-                                        val job = avtaleHendelseConsumer.kallProducerForKassering(it)
-                                        log.info("Startet en coroutine for å sende kasseringsmelding til aktivitetsplan med job ${job.key}")
-                                    } else {
-                                        val job = avtaleHendelseConsumer.kallProducer(it)
-                                        log.info("Startet en coroutine for å sende melding til aktivitetsplan med job ${job.key}")
-                                    }
                                     avtaleHendelseConsumer.kallProducer(
                                         AktivitetsplanMeldingEntitet.fra(UUID.randomUUID(), it)
                                     )
@@ -106,7 +97,7 @@ class App(
         server.start()
         coroutineScope {
             launch { avtaleHendelseConsumer.start() }
-            //launch { aktivitetsplanFeilConsumer.start() }
+            launch { aktivitetsplanFeilConsumer.start() }
         }
     }
 
