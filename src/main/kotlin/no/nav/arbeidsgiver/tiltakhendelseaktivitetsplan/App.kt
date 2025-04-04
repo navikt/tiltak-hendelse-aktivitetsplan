@@ -1,8 +1,5 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.nimbusds.jose.util.DefaultResourceRetriever
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
@@ -39,9 +36,6 @@ class App(
     private val database: Database
 ) : Closeable {
     private val logger = KotlinLogging.logger {}
-    private val mapper = jacksonObjectMapper()
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .registerModule(JavaTimeModule())
     private val server = embeddedServer(Netty, port = 8080) {
         install(ContentNegotiation) {
             jackson {}
@@ -53,28 +47,32 @@ class App(
             get("/tiltak-hendelse-aktivitetsplan/internal/isAlive") { call.respond(HttpStatusCode.OK) }
             get("/tiltak-hendelse-aktivitetsplan/internal/isReady") { call.respond(HttpStatusCode.OK) }
             authenticate {
-                put("/tiltak-hendelse-aktivitetsplan/api/aktivitetsplan-id") {
+                put("/tiltak-hendelse-aktivitetsplan/api/avtale/{avtaleId}/aktivitetsplan-id") {
                     try {
+                        val avtaleId = AvtaleId(
+                            call.parameters["avtaleId"]
+                                ?: throw IllegalArgumentException("Avtale-id mangler i forespørselen")
+                        )
                         val avtalemeldingRequest = call.receive<AvtalemeldingRequest>()
 
                         log.info(
                             "Oppdaterer avtale {} med aktivitetsplan id {}",
-                            avtalemeldingRequest.avtaleId,
+                            avtaleId,
                             avtalemeldingRequest.aktivitetsplanId
                         )
 
                         database.upsertAktivitetsplanId(
-                            avtalemeldingRequest.avtaleId,
+                            avtaleId,
                             avtalemeldingRequest.aktivitetsplanId,
                         )
 
                         if (avtalemeldingRequest.resendSisteMelding) {
-                            database.hentEntitet(avtalemeldingRequest.avtaleId)
+                            database.hentEntitet(avtaleId)
                                 .filter { it.sendt }
                                 .maxByOrNull { it.opprettetTidspunkt }
                                 ?.let {
                                     logger.info(
-                                        "Sender melding ${it.id} på ny for avtale ${avtalemeldingRequest.avtaleId}"
+                                        "Sender melding ${it.id} på ny for avtale ${avtaleId}"
                                     )
                                     avtaleHendelseConsumer.kallProducer(
                                         AktivitetsplanMeldingEntitet.fra(UUID.randomUUID(), it)
@@ -82,6 +80,31 @@ class App(
                                 }
                         }
 
+                        call.respond(HttpStatusCode.NoContent)
+                    } catch (ex: Exception) {
+                        log.error("Feil ved oppdatering av avtale", ex)
+                        call.respond(HttpStatusCode.BadRequest)
+                    }
+                }
+            }
+            authenticate {
+                post("/tiltak-hendelse-aktivitetsplan/api/avtale/{avtaleId}/send-siste-melding") {
+                    try {
+                        val avtaleId = AvtaleId(
+                            call.parameters["avtaleId"]
+                                ?: throw IllegalArgumentException("Avtale-id mangler i forespørselen")
+                        )
+                        database.hentEntitet(avtaleId)
+                            .filter { it.sendt }
+                            .maxByOrNull { it.opprettetTidspunkt }
+                            ?.let {
+                                logger.info(
+                                    "Sender melding ${it.id} på ny for avtale ${avtaleId}"
+                                )
+                                avtaleHendelseConsumer.kallProducer(
+                                    AktivitetsplanMeldingEntitet.fra(UUID.randomUUID(), it)
+                                )
+                            }
                         call.respond(HttpStatusCode.NoContent)
                     } catch (ex: Exception) {
                         log.error("Feil ved oppdatering av avtale", ex)
