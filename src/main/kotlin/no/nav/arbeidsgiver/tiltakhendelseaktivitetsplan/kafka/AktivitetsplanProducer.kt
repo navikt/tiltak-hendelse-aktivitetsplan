@@ -42,9 +42,10 @@ class AktivitetsplanProducer(
         val meldingJson = mapper.writeValueAsString(aktivitetsplanMelding)
 
         log.info(
-            "Sender melding for avtaleId {} og aktivitetsplanId {} til aktivitetsplan",
+            "Sender melding for avtaleId {} og aktivitetsplanId {} med melding id {} til aktivitetsplan",
             entitet.avtaleId,
-            aktivitetsplanId
+            aktivitetsplanId,
+            aktivitetsplanMelding.messageId
         )
 
         if (!schema.validate(meldingJson)) {
@@ -81,9 +82,10 @@ class AktivitetsplanProducer(
         val meldingJson = mapper.writeValueAsString(kasseringsMelding)
 
         log.info(
-            "Sender kasseringsmelding for avtaleId {} og aktivitetsplanId {} til aktivitetsplan",
+            "Sender kasseringsmelding for avtaleId {} og aktivitetsplanId {} med melding id {} til aktivitetsplan",
             entitet.avtaleId,
-            aktivitetsplanId
+            aktivitetsplanId,
+            kasseringsMelding.messageId
         )
 
         if (!kasseringSchema.validate(meldingJson)) {
