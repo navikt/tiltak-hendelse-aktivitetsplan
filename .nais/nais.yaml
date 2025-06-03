@@ -27,11 +27,8 @@ spec:
     max: 1
     cpuThresholdPercentage: 50
   resources:
-    limits:
-      cpu: "200m"
-      memory: "256Mi"
     requests:
-      cpu: "200m"
+      cpu: "50m"
       memory: "256Mi"
   gcp:
     sqlInstances:
