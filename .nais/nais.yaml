@@ -27,12 +27,11 @@ spec:
     max: 1
     cpuThresholdPercentage: 50
   resources:
-    limits:
-      cpu: "200m"
-      memory: "256Mi"
+    limit:
+      memory: "400Mi"
     requests:
-      cpu: "200m"
-      memory: "256Mi"
+      cpu: "150m"
+      memory: "320Mi"
   gcp:
     sqlInstances:
     - type: POSTGRES_14
