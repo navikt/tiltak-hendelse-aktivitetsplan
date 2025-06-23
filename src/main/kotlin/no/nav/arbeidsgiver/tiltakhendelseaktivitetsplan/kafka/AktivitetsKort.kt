@@ -57,11 +57,16 @@ data class AktivitetsKort(
         }
 
         private fun formaterTittel(tiltakstype: Tiltakstype, stillingstittel: String?, bedriftNavn: String?): String {
-            if (stillingstittel.isNullOrBlank() || bedriftNavn.isNullOrBlank()) {
-                return "Avtale om ${tiltakstype.beskrivelse}"
+            if (tiltakstype == Tiltakstype.MENTOR) {
+                return "Avtale om tilskudd til mentor"
             }
-
-            return "$stillingstittel hos $bedriftNavn"
+            if (!stillingstittel.isNullOrBlank() && !bedriftNavn.isNullOrBlank()) {
+                return "$stillingstittel hos $bedriftNavn"
+            }
+            if (!bedriftNavn.isNullOrBlank()) {
+                return "${tiltakstype.beskrivelse} hos $bedriftNavn"
+            }
+            return "Avtale om ${tiltakstype.beskrivelse}"
         }
 
         private fun lagAttributt(label: String, verdi: String?): Attributt {
