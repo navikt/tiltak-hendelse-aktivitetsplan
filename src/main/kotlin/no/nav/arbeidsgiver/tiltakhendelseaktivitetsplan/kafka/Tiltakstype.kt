@@ -4,7 +4,7 @@ enum class Tiltakstype(val beskrivelse: String, val skalTilAktivitetsplan: Boole
     ARBEIDSTRENING("Arbeidstrening", true),
     MIDLERTIDIG_LONNSTILSKUDD("Midlertidig lønnstilskudd", true),
     VARIG_LONNSTILSKUDD("Varig lønnstilskudd", true),
-    MENTOR("Mentor", false),
+    MENTOR("Mentor", true),
     INKLUDERINGSTILSKUDD("Inkluderingstilskudd", false),
     SOMMERJOBB("Sommerjobb", false),
     VTAO("Varig tilrettelagt arbeid i ordinær virksomhet", true);
