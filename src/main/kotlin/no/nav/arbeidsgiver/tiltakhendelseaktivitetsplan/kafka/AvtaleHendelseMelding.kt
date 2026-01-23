@@ -28,5 +28,10 @@ data class AvtaleHendelseMelding(
     val veilederNavIdent: String?,
     val annullertGrunn: String?,
     val antallDagerPerUke: BigDecimal?,
-    val opphav: AvtaleOpphav
+    val opphav: AvtaleOpphav,
+    val mentorAntallTimer: Double?,
+    val arbeidsgiverKontonummer: String?,
+    val feriepengesats: BigDecimal?,
+    val arbeidsgiveravgift: BigDecimal?,
+    val otpSats: Double?
 )
