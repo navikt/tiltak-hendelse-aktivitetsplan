@@ -57,8 +57,8 @@ data class AktivitetsKort(
                 val mentorTimeEnhet = if (mentorBeregninger.any { it != null }) "måned" else "uke"
 
                 return listOf(
-                    lagAttributt("Arbeidsgiver", melding.bedriftNavn),
-                    lagAttributt("Antall timer mentor per $mentorTimeEnhet", melding.mentorAntallTimer?.toString()),
+                    lagAttributt(label = "Arbeidsgiver", verdi = melding.bedriftNavn),
+                    lagAttributt(label = "Antall timer mentor per $mentorTimeEnhet", verdi = melding.mentorAntallTimer?.toString()),
                 )
             }
 
