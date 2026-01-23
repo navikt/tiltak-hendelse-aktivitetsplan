@@ -58,7 +58,7 @@ data class AktivitetsKort(
 
                 return listOf(
                     lagAttributt(label = "Arbeidsgiver", verdi = melding.bedriftNavn),
-                    lagAttributt(label = "Antall timer mentor per $mentorTimeEnhet", verdi = melding.mentorAntallTimer?.toString()),
+                    lagAttributt(label = "Antall timer mentor per $mentorTimeEnhet", verdi = melding.mentorAntallTimer?.toInt()?.toString()),
                 )
             }
 
