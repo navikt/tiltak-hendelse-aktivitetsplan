@@ -54,7 +54,7 @@ data class AktivitetsKort(
         private fun lagDetaljer(melding: AvtaleHendelseMelding): List<Attributt> {
             if (melding.tiltakstype == Tiltakstype.MENTOR) {
                 val mentorBeregninger = listOf(melding.arbeidsgiverKontonummer, melding.otpSats, melding.arbeidsgiveravgift, melding.feriepengesats)
-                val mentorTimeEnhet = if (mentorBeregninger.any{ it != null }) "måned" else "uke"
+                val mentorTimeEnhet = if (mentorBeregninger.any { it != null }) "måned" else "uke"
 
                 return listOf(
                     lagAttributt("Arbeidsgiver", melding.bedriftNavn),
