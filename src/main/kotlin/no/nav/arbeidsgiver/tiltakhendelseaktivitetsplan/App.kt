@@ -73,7 +73,7 @@ class App(
                                         "Sender melding ${it.id} på ny for avtale ${avtaleId}"
                                     )
                                     avtaleHendelseConsumer.kallProducer(it)
-                                }
+                                }?: log.warn("Finner ingen tidligere sendt melding for avtale $avtaleId - Du bør sende siste avtalehendelsemelding på nytt via patch i tiltaksgjennomforing-api")
                         }
 
                         call.respond(HttpStatusCode.NoContent)

@@ -47,12 +47,26 @@ data class AktivitetsKort(
                     LenkeSeksjon("Gå til avtalen", "", lenke("INTERN", melding.avtaleId), LenkeType.INTERN),
                     LenkeSeksjon("Gå til avtalen", "", lenke("EKSTERN", melding.avtaleId), LenkeType.EKSTERN)
                 ),
-                detaljer = listOf(
+                detaljer = lagDetaljer(melding)
+            )
+        }
+
+        private fun lagDetaljer(melding: AvtaleHendelseMelding): List<Attributt> {
+            if (melding.tiltakstype == Tiltakstype.MENTOR) {
+                val mentorBeregninger = listOf(melding.arbeidsgiverKontonummer, melding.otpSats, melding.arbeidsgiveravgift, melding.feriepengesats)
+                val mentorTimeEnhet = if (mentorBeregninger.any { it != null }) "måned" else "uke"
+
+                return listOf(
                     lagAttributt(label = "Arbeidsgiver", verdi = melding.bedriftNavn),
-                    lagAttributt(label = "Stilling", verdi = melding.stillingstittel),
-                    lagAttributt(label = "Stillingsprosent", verdi = melding.stillingprosent?.toString()),
-                    lagAttributt(label = "Antall dager per uke", verdi = melding.antallDagerPerUke?.toString())
+                    lagAttributt(label = "Antall timer mentor per $mentorTimeEnhet", verdi = melding.mentorAntallTimer?.toString()),
                 )
+            }
+
+            return listOf(
+                lagAttributt(label = "Arbeidsgiver", verdi = melding.bedriftNavn),
+                lagAttributt(label = "Stilling", verdi = melding.stillingstittel),
+                lagAttributt(label = "Stillingsprosent", verdi = melding.stillingprosent?.toString()),
+                lagAttributt(label = "Antall dager per uke", verdi = melding.antallDagerPerUke?.toString())
             )
         }
 
@@ -70,7 +84,7 @@ data class AktivitetsKort(
         }
 
         private fun lagAttributt(label: String, verdi: String?): Attributt {
-            val feltVerdi = if (verdi !== null) verdi.toString() else "Ikke fylt ut";
+            val feltVerdi = if (verdi !== null) verdi else "Ikke fylt ut";
             return Attributt(label = label, verdi = feltVerdi)
         }
 
