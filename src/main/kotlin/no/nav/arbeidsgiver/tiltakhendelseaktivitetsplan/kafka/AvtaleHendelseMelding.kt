@@ -34,4 +34,8 @@ data class AvtaleHendelseMelding(
     val feriepengesats: BigDecimal?,
     val arbeidsgiveravgift: BigDecimal?,
     val otpSats: Double?
-)
+) {
+    fun erAvtaleInngått(): Boolean {
+        return avtaleInngått != null
+    }
+}
