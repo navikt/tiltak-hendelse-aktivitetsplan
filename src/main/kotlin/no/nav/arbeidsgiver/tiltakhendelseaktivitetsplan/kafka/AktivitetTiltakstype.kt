@@ -5,6 +5,7 @@ enum class AktivitetTiltakstype {
     VARIG_LONNSTILSKUDD,
     ARBEIDSTRENING,
     VARIG_TILRETTELAGT_ARBEID_I_ORDINAER_VIRKSOMHET,
+    SOMMERJOBB,
     MENTOR;
 
     companion object {
@@ -14,6 +15,7 @@ enum class AktivitetTiltakstype {
                 Tiltakstype.VARIG_LONNSTILSKUDD -> VARIG_LONNSTILSKUDD
                 Tiltakstype.ARBEIDSTRENING -> ARBEIDSTRENING
                 Tiltakstype.VTAO -> VARIG_TILRETTELAGT_ARBEID_I_ORDINAER_VIRKSOMHET
+                Tiltakstype.SOMMERJOBB -> SOMMERJOBB
                 Tiltakstype.MENTOR -> MENTOR
                 else -> throw IllegalArgumentException("Ukjent tiltakstype: $tiltakstype")
             }
