@@ -1,6 +1,7 @@
 package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.server.testing.*
@@ -24,13 +25,16 @@ import java.time.ZonedDateTime
 import java.util.*
 import kotlin.test.Test
 import kotlin.test.assertNotEquals
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 // https://navikt.github.io/veilarbaktivitet/aktivitetskortV1
 class AppTest {
 
-    val mapper = jacksonObjectMapper()
+    val mapper: ObjectMapper = jacksonObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .registerModule(JavaTimeModule())
+
     @Test
     fun testKomplettApp() = runTest {
         testApplication {
@@ -66,7 +70,7 @@ class AppTest {
             val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer, database)
             Server.createWebServer().start()
 
-            val result = withTimeoutOrNull(10000) { // Timeout etter (10 sekunder)
+            val result = withTimeoutOrNull(10.seconds) { // Timeout etter (10 sekunder)
                 scope.launch {// UTEN SCOPE VIL FEIL CONSUMER ALDRI KUNNE LESE FRA database
                     app.start()
                 }
@@ -77,7 +81,7 @@ class AppTest {
                 scope.cancel()
             }
 
-            delay(1000)
+            delay(1.seconds)
             val dataBehandletOgLagret: List<AktivitetsplanMeldingEntitet> = database.hentEntitet(avtaleID)
 
             testProducer.close()
@@ -231,7 +235,7 @@ class AppTest {
         runBlocking {runnerBlocking()}
     }
     internal suspend fun runner_UTEN_Run_Blocking(){
-        val scope = kotlinx.coroutines.CoroutineScope(Dispatchers.Default)
+        val scope = CoroutineScope(Dispatchers.Default)
 
         // Create a single instance of the repository
         val repository = MyDatabaseRepositoryMock()
@@ -253,7 +257,7 @@ class AppTest {
                 }
             }
 
-        delay(Long.MAX_VALUE)
+        delay(Duration.INFINITE)
     }
 
     internal suspend fun  runnerBlocking(){

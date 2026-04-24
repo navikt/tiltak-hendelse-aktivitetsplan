@@ -12,7 +12,7 @@ import java.time.LocalDate
 
 data class AktivitetsKort(
     // Obligatoriske
-    @JsonSerialize(using = AktivitetsplanId.Serializer::class)
+    @get:JsonSerialize(using = AktivitetsplanId.Serializer::class)
     val id: AktivitetsplanId,
     val personIdent: String,
     val startDato: LocalDate?,
