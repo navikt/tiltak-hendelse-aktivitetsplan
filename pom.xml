@@ -239,7 +239,7 @@
         <dependency>
             <groupId>net.pwall.json</groupId>
             <artifactId>json-kotlin-schema</artifactId>
-            <version>0.39</version>
+            <version>0.57</version>
         </dependency>
         <dependency>
             <groupId>no.nav.security</groupId>
