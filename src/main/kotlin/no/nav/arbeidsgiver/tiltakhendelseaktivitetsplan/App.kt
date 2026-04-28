@@ -38,7 +38,7 @@ class App(
             jackson {}
         }
         install(Authentication) {
-            tokenValidationSupport(config = ApplicationConfig(loadApplicationConfig().path), resourceRetriever = DefaultResourceRetriever())
+            tokenValidationSupport(config = ApplicationConfig("application.conf"), resourceRetriever = DefaultResourceRetriever())
         }
         routing {
             get("/tiltak-hendelse-aktivitetsplan/internal/isAlive") { call.respond(HttpStatusCode.OK) }

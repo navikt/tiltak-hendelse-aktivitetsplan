@@ -9,8 +9,6 @@ fun loadAktivitetsplanSchema(): JSONSchema = loadSchemaFromClasspath("schema.yml
 
 fun loadKasseringSchema(): JSONSchema = loadSchemaFromClasspath("schema-kassering.yml")
 
-fun loadApplicationConfig() = loadFromClasspath("application.conf")
-
 fun loadSchemaFromClasspath(resourceName: String): JSONSchema = JSONSchema.parse(loadFromClasspath(resourceName))
 
 fun loadFromClasspath(resourceName: String): File {
