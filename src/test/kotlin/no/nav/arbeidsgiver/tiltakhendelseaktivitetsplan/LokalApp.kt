@@ -11,8 +11,8 @@ import org.apache.kafka.clients.producer.Producer
 import org.h2.tools.Server
 
 suspend fun main() {
-    val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
-    val kasseringSchema = JSONSchema.parseFile("src/test/resources/schema-kassering.yml")
+    val schema = JSONSchema.parseFile("src/main/resources/schema.yml")
+    val kasseringSchema = JSONSchema.parseFile("src/main/resources/schema-kassering.yml")
     // Testoppsett
     val consumer: Consumer<String, String> = KafkaConsumer(testConsumerConfig())
     val producer: Producer<String, String> = KafkaProducer(testProducerConfig())

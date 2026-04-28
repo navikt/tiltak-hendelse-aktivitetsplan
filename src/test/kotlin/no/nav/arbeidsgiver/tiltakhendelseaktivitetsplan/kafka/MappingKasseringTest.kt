@@ -128,7 +128,7 @@ class MappingKasseringTest {
             melding = kasseringMelding
         )
 
-        val schemaKassering = JSONSchema.parseFile("src/test/resources/schema-kassering.yml")
+        val schemaKassering = JSONSchema.parseFile("src/main/resources/schema-kassering.yml")
 
         val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(JavaTimeModule())
