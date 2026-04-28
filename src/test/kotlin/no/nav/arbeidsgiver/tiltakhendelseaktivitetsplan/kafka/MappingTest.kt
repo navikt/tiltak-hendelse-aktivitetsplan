@@ -146,7 +146,7 @@ class MappingTest {
 
         val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "TEAM_TILTAK", "UPSERT_AKTIVITETSKORT_V1", AktivitetTiltakstype.MIDLERTIDIG_LONNSTILSKUDD, aktivitetsKort)
 
-        val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
+        val schema = JSONSchema.parseFile("src/main/resources/schema.yml")
 
         val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(JavaTimeModule())

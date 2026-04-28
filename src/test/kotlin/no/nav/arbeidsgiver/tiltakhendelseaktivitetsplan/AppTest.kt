@@ -55,8 +55,8 @@ class AppTest {
             testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, avtaleID.toString(), enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
             testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, UUID.randomUUID().toString(), enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
 
-            val schema = JSONSchema.parseFile("src/test/resources/schema.yml")
-            val kasseringSchema = JSONSchema.parseFile("src/test/resources/schema-kassering.yml")
+            val schema = JSONSchema.parseFile("src/main/resources/schema.yml")
+            val kasseringSchema = JSONSchema.parseFile("src/main/resources/schema-kassering.yml")
             // Testoppsett
             val consumer: Consumer<String, String> = KafkaConsumer(testConsumerConfig(kafkaContainer.bootstrapServers))
             val feilConsumer: Consumer<String, String> = KafkaConsumer(testConsumerConfig(kafkaContainer.bootstrapServers))
