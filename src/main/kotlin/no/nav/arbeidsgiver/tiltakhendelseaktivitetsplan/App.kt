@@ -15,7 +15,6 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import mu.KotlinLogging
-import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.dataSource
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.dto.AvtalemeldingRequest
@@ -39,7 +38,7 @@ class App(
             jackson {}
         }
         install(Authentication) {
-            tokenValidationSupport(config = ApplicationConfig("application.conf"), resourceRetriever = DefaultResourceRetriever())
+            tokenValidationSupport(config = ApplicationConfig(loadApplicationConfig().path), resourceRetriever = DefaultResourceRetriever())
         }
         routing {
             get("/tiltak-hendelse-aktivitetsplan/internal/isAlive") { call.respond(HttpStatusCode.OK) }
@@ -127,8 +126,8 @@ class App(
 suspend fun main() {
     val logger = KotlinLogging.logger {}
     try {
-        val schema = JSONSchema.parseFile("schema.yml")
-        val kasseringSchema = JSONSchema.parseFile("schema-kassering.yml")
+        val schema = loadAktivitetsplanSchema()
+        val kasseringSchema = loadKasseringSchema()
         // Setup kafka and database
         val consumer: Consumer<String, String> = KafkaConsumer(consumerConfig())
         val feilConsumer: Consumer<String, String> = KafkaConsumer(feilConsumerConfig())

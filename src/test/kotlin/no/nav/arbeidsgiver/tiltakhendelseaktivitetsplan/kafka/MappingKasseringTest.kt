@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import net.pwall.json.schema.JSONSchema
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.loadKasseringSchema
 import org.junit.jupiter.api.Test
 
 class MappingKasseringTest {
@@ -128,7 +128,7 @@ class MappingKasseringTest {
             melding = kasseringMelding
         )
 
-        val schemaKassering = JSONSchema.parseFile("src/main/resources/schema-kassering.yml")
+        val schemaKassering = loadKasseringSchema()
 
         val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(JavaTimeModule())

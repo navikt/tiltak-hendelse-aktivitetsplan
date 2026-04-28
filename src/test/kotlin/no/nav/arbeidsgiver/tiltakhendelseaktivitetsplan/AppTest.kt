@@ -7,7 +7,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.server.testing.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.runTest
-import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.AktivitetsplanMeldingEntitet
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.Database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database.testDataSource
@@ -55,8 +54,8 @@ class AppTest {
             testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, avtaleID.toString(), enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
             testProducer.send(ProducerRecord(Topics.AKTIVITETSPLAN_FEIL, UUID.randomUUID().toString(), enFeilMeldingFraTeamDab_aktivitetsplan().trimMargin()))
 
-            val schema = JSONSchema.parseFile("src/main/resources/schema.yml")
-            val kasseringSchema = JSONSchema.parseFile("src/main/resources/schema-kassering.yml")
+            val schema = loadAktivitetsplanSchema()
+            val kasseringSchema = loadKasseringSchema()
             // Testoppsett
             val consumer: Consumer<String, String> = KafkaConsumer(testConsumerConfig(kafkaContainer.bootstrapServers))
             val feilConsumer: Consumer<String, String> = KafkaConsumer(testConsumerConfig(kafkaContainer.bootstrapServers))

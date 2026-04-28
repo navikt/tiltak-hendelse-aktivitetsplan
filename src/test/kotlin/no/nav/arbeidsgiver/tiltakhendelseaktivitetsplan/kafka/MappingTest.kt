@@ -6,10 +6,10 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import net.pwall.json.schema.JSONSchema
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.Attributt
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeSeksjon
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.aktivitetsplan.LenkeType
+import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.loadAktivitetsplanSchema
 import org.junit.jupiter.api.Test
 import java.net.URL
 import java.time.Instant
@@ -146,7 +146,7 @@ class MappingTest {
 
         val aktivitetsplanMelding = AktivitetsplanMelding.fromAktivitetskort(UUID.randomUUID(), "TEAM_TILTAK", "UPSERT_AKTIVITETSKORT_V1", AktivitetTiltakstype.MIDLERTIDIG_LONNSTILSKUDD, aktivitetsKort)
 
-        val schema = JSONSchema.parseFile("src/main/resources/schema.yml")
+        val schema = loadAktivitetsplanSchema()
 
         val mapper: ObjectMapper = jacksonObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             .registerModule(JavaTimeModule())
