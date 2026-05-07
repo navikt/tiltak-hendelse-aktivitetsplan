@@ -16,7 +16,6 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.h2.tools.Server
 import org.junit.jupiter.api.Disabled
 import org.testcontainers.containers.KafkaContainer
 import org.testcontainers.utility.DockerImageName
@@ -68,7 +67,6 @@ class AppTest {
 
             val scope = CoroutineScope(Dispatchers.Default)
             val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer, database)
-            Server.createWebServer().start()
 
             val result = withTimeoutOrNull(10.seconds) { // Timeout etter (10 sekunder)
                 scope.launch {// UTEN SCOPE VIL FEIL CONSUMER ALDRI KUNNE LESE FRA database

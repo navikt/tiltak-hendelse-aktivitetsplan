@@ -3,6 +3,7 @@ package no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.database
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleId
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.AvtaleStatus
 import no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.kafka.HendelseType
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.*
@@ -11,6 +12,13 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class DatabaseTest {
+
+    private val database = Database(testDataSource)
+
+    @BeforeEach
+    fun setup() {
+        resetTestDatabase()
+    }
 
     val entitet = AktivitetsplanMeldingEntitet(
         id = UUID.fromString("6cb7a6ce-59d7-11ed-9b6a-0242ac120002"),
@@ -75,7 +83,6 @@ class DatabaseTest {
 
     @Test
     fun skal_kunne_lagre_og_hente_entiteter() {
-        val database = Database(testDataSource)
         database.lagreNyAktivitetsplanMeldingEntitet(entitet)
         val aktivitetsplanMeldingEntitet = database.hentEntitet(UUID.fromString("6cb7a6ce-59d7-11ed-9b6a-0242ac120002"))
         val aktivitetsplanMeldingEntitetHentetMedAvtaleId = database.hentEntitet(AvtaleId("251c5828-59dc-11ed-9b6a-0242ac120002"))
@@ -86,7 +93,6 @@ class DatabaseTest {
 
     @Test
     fun skal_lunne_lagre_flere_meldinger_med_samme_avtale_id() {
-        val database = Database(testDataSource)
         database.lagreNyAktivitetsplanMeldingEntitet(entitet3medSammeAvtaleId)
         database.lagreNyAktivitetsplanMeldingEntitet(entitet4medSammeAvtaleId)
         val aktivitetsplanMeldingEntitetHentetMedAvtaleId = database.hentEntitet(AvtaleId("64e80700-c9b9-4e03-9741-7566eb0542e7"))
@@ -95,7 +101,6 @@ class DatabaseTest {
 
     @Test
     fun skal_kunne_oppdatere_entitet_til_sendt() {
-        val database = Database(testDataSource)
         database.lagreNyAktivitetsplanMeldingEntitet(entitet2)
         database.settEntitetTilSendt(UUID.fromString("66276156-9bc6-11ed-a8fc-0242ac120002"), 1337L)
         val aktivitetsplanMeldingEntitet = database.hentEntitet(UUID.fromString("66276156-9bc6-11ed-a8fc-0242ac120002"))
@@ -108,7 +113,6 @@ class DatabaseTest {
 
     @Test
     fun skal_kunne_lagre_feilede_hendelse_i_database() {
-        val database = Database(testDataSource)
         database.lagreNyHendelseMeldingFeiletEntitet(feiletEntitet)
     }
 
