@@ -91,6 +91,11 @@
                                 <manifest>
                                     <mainClass>no.nav.arbeidsgiver.tiltakhendelseaktivitetsplan.AppKt</mainClass>
                                 </manifest>
+                                <manifestEntries>
+                                    <!-- Ble nødvendig etter oppgradering av postgres-driver (nyere versjon av bibliotek
+                                    ble en multi-release, som smitter over til vår app) -->
+                                    <Multi-Release>true</Multi-Release>
+                                </manifestEntries>
                             </archive>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
