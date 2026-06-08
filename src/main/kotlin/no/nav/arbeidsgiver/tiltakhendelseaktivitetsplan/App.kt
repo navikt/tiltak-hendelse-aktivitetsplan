@@ -91,12 +91,14 @@ class App(
                                 ?: throw IllegalArgumentException("Avtale-id mangler i forespørselen")
                         )
                         database.hentEntitet(avtaleId)
-                            .filter { it.sendt }
                             .maxByOrNull { it.opprettetTidspunkt }
                             ?.let {
                                 logger.info(
                                     "Sender melding ${it.id} på ny for avtale ${avtaleId}"
                                 )
+                                if (!it.sendt) {
+                                    logger.info("Siste melding for avtale ${avtaleId} har ikke blitt sendt tidligere")
+                                }
                                 avtaleHendelseConsumer.kallProducer(it)
                             }
                         call.respond(HttpStatusCode.NoContent)
