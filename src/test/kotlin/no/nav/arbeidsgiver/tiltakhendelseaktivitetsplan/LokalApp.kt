@@ -8,7 +8,6 @@ import org.apache.kafka.clients.consumer.Consumer
 import org.apache.kafka.clients.consumer.KafkaConsumer
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
-import org.h2.tools.Server
 
 suspend fun main() {
     val schema = JSONSchema.parseFile("src/main/resources/schema.yml")
@@ -22,7 +21,5 @@ suspend fun main() {
     val aktivitetsplanFeilConsumer = FeilConsumer(consumer, database)
 
     val app = App(avtaleHendelseConsumer, aktivitetsplanFeilConsumer, database)
-    val server = Server.createWebServer().start()
-    println("\n H2 Started med status: ${server.status} \n")
     app.start()
 }
