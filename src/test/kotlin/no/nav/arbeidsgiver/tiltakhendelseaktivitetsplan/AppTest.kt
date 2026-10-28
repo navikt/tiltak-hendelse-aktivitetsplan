@@ -18,7 +18,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.h2.tools.Server
 import org.junit.jupiter.api.Disabled
-import org.testcontainers.containers.KafkaContainer
+import org.testcontainers.kafka.ConfluentKafkaContainer
 import org.testcontainers.utility.DockerImageName
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -38,7 +38,7 @@ class AppTest {
     @Test
     fun testKomplettApp() = runTest {
         testApplication {
-            val kafkaContainer = KafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:6.2.0"))
+            val kafkaContainer = ConfluentKafkaContainer(DockerImageName.parse("confluentinc/cp-kafka:7.4.0"))
             kafkaContainer.start()
             val producerProps = Properties().apply {
                 put("bootstrap.servers", kafkaContainer.bootstrapServers)
