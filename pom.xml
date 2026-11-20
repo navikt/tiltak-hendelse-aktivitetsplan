@@ -14,7 +14,7 @@
     <properties>
         <java.version>25</java.version>
         <kotlin.version>2.3.21</kotlin.version>
-        <ktor.version>2.3.12</ktor.version>
+        <ktor.version>3.6.1</ktor.version>
     </properties>
 
     <repositories>
